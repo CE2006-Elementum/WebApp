@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 
 import { Button, RadioButton, TextArea, TextField } from "../Components/InputField";
 import { contact } from '../Utils/Enums';
+import { postContactUs } from '../Utils/Fetch';
 
 export default function ContactUs(){
     const [contactForm, setContactForm] = useState({...contact});
+    const [error, setError] = useState({error: ""});
+    const [res, setRes] = useState({result: ""})
 
     /**
      * Contact Us Form handler to prepare the request that is to be sent on click
@@ -18,12 +21,35 @@ export default function ContactUs(){
         shallowCopy.contact[keys[index]] = e;
         setContactForm(shallowCopy);
     }
+
+    /**
+     * Validates the form data and tries to submit the form to the server
+     */
+    const submitContactForm = () => {
+        setError({error: ""});
+        if(contactForm.contact.firstName === "" || contactForm.contact.firstName === null
+            || contactForm.contact.lastName === "" || contactForm.contact.last === null
+            || contactForm.contact.message === "" || contactForm.contact.message === null
+            || contactForm.contact.mobile === "" || contactForm.contact.mobile === null) {
+            setError({error: "Please ensure that all fields are filled!"});
+            return;
+        }
+        postContactUs(contactForm.contact).then(response => {
+            if(response.status === 200)
+                return response.json();
+            else setError({error: "Error! " + response.status});
+        }).then(response => {
+            if(response)
+                setRes({result: response});
+        })
+    }
     
     return (
         <div className="contact-container" style={{display: "flex", flexDirection: "column", backgroundImage: "linear-gradient(to bottom, #F8F1E4, #FFFFFF)"}}>
             <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginTop: 50, padding: 20, flexWrap: "wrap"}}>
                 <div style={{display: "flex", flexDirection: "column", margin: "auto", flexWrap: "wrap"}}>
                     <h3 className="title">Contact Us</h3>
+                    <span>{error.error}</span>
                     <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginBottom: 20}}>
                         <div style={{display: "flex", flexDirection: "column", marginRight: 20}}>
                             <label className="input-label" htmlFor="firstName">Name *</label>
@@ -103,8 +129,10 @@ export default function ContactUs(){
                             onClick={(e) => {
                                 //TODO: Send form request to server
                                 e.preventDefault();
+                                submitContactForm();
                             }}
                         />
+                        <span>{res.result}</span>
                     </div>
                     <div style={{display: "flex", flexDirection: "column", marginBottom: 20}}>
                         <h4 className="info">Customer support</h4>

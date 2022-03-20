@@ -1,19 +1,23 @@
-import { useMediaQuery } from 'beautiful-react-hooks';
 import React, { useState } from 'react';
+import { useMediaQuery } from 'beautiful-react-hooks';
 import { HashLink } from 'react-router-hash-link';
-import Accordion from '../Components/Accordion';
+import { useNavigate } from 'react-router-dom';
 
+import Accordion from '../Components/Accordion';
 import Carousel from '../Components/Carousel';
 import { DropDown, TextField, Button, RangeSlider, CheckBox } from '../Components/InputField';
 import { flatType, carouselLanding, carouselInfo, accordionInfo, rangeMarks, search, valuation } from '../Utils/Enums';
+import { fetchSearchRequest, fetchValuationRequest } from '../Utils/Fetch';
 
 /**
  * Landing screen / Home screen
  */
 export default function Index(){
+    const navigate = useNavigate();
     const tooSmall = useMediaQuery('(max-width: 768px)');
     const [searchForm, setSearchForm] = useState({...search});
     const [valuationForm, setValuationForm] = useState({...valuation});
+    const [error, setError] = useState({search: "", valuation: ""});
 
     /**
      * Custom Carousel Indicator for form selection
@@ -48,8 +52,10 @@ export default function Index(){
         const secondaryKeys = Object.keys(shallowCopy.search[keys[index]]); //Get all secondary keys
         const secondaryIndex = secondaryKeys.indexOf(keySplit[1]); //Get index of matching secondary key
         if(keySplit.length === 2) {
-            if(typeof(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]]) === "object") //Checks if the typeof the key-value pair is an object
-                shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].push(e);
+            if(typeof(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]]) === "object") { //Checks if the typeof the key-value pair is an object
+                if(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].indexOf(e) === -1)
+                    shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].push(e);
+            }
             else shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]] = e;
         } else if(keySplit.length === 3) {
             const tertiaryKeys = Object.keys(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]]); //Get all tertiary keys
@@ -72,6 +78,48 @@ export default function Index(){
         const index = keys.indexOf(key); //Get index of matching key
         shallowCopy.valuation[keys[index]] = e;
         setValuationForm(shallowCopy);
+    }
+
+    /**
+     * Performs a validation on searchForm to ensure that all fields are filled. Then, proceeds to fetch data from the server.
+     * @returns Nothing, only to cause navigation on success, else it'll display an error message.
+     */
+    const submitSearch = async() => {
+        setError({...error, search: ""});
+        if(searchForm.search.roi.center === null || searchForm.search.roi.center === ""
+            || searchForm.search.roi.radius === 0.0 || searchForm.search.facilities.musthave.length <= 0) {
+            setError({...error, search: "Please check if you've filled in all fields."});
+            return;
+        }
+        fetchSearchRequest(searchForm.search).then(response => {
+            if(response.status === 200)
+                return response.json();
+            else setError({...error, search: "Error! " + response.status + " Please contact our support team!"});
+        }).then(response => {
+            if(response)
+                navigate('/locationfinder', {state: {data: response}});
+        })
+    }
+
+    /**
+     * Performs a validation on searchForm to ensure that all fields are filled. Then, proceeds to fetch data from the server.
+     * @returns Nothing, only to cause navigation on success, else it'll display an error message.
+     */
+    const submitValuation = async() => {
+        setError({...error, valuation: ""});
+        if(valuationForm.valuation.area <= 0 || valuationForm.valuation.location === null 
+            || valuationForm.valuation.location === "") {
+                setError({...error, valuation: "Please check if you've filled in all fields."});
+                return;
+            }
+        fetchValuationRequest(valuationForm.valuation).then(response => {
+            if(response.status === 200)
+                return response.json();
+            else setError({...error, valuation: "Error! " + response.status + " Please contact our support team!"});
+        }).then(response => {
+            if(response)
+                navigate('/valuation', {state: {data: response}});
+        })
     }
 
 
@@ -158,11 +206,12 @@ export default function Index(){
                         <div id="locationFinder" style={{padding: 20, width: "100%", display: "flex", flexDirection: "column",}}>
                             <h2 className="form-header" style={{color: "var(--font-color-active)"}}>Start searching for your dream home location with us!!</h2>
                             <form>
+                                <span style={{fontSize: 24, color: "red"}}>{error.search}</span>
                                 <TextField
                                     name={"address"}
-                                    placeholder={"Postal Code / Address"}
+                                    placeholder={"Address"}
                                     styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
-                                    onChange={(e) => {updateLocationFinderForm(e.target.value, "center")}}
+                                    onChange={(e) => {updateLocationFinderForm(e, "roi.center")}}
                                     containerStyle={{margin: 15}}
                                 />
                                 <div style={{display:"flex", flexDirection: "column", alignItems: "self-start", paddingBottom: 30}}>
@@ -193,9 +242,9 @@ export default function Index(){
                                     </Accordion>
                                     { 
                                         tooSmall ? 
-                                            <RangeSlider label={"Range"} min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseInt(e), "roi.radius")} units={"km"}/> 
+                                            <RangeSlider label={"Range"} min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseFloat(e), "facilities.distance")} units={"km"}/> 
                                             :  
-                                            <RangeSlider label={"Range"} min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseInt(e), "roi.radius")} marks={rangeMarks} units={"km"}/> 
+                                            <RangeSlider label={"Range"} min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseFloat(e), "facilities.distance")} marks={rangeMarks} units={"km"}/> 
                                     }
                                 </div>
                                 <Button 
@@ -224,6 +273,7 @@ export default function Index(){
                                     onClickHandler={(e) => {
                                         //TODO: Send form request to server
                                         e.preventDefault();
+                                        submitSearch();
                                     }
                                 }
                                 />
@@ -232,9 +282,10 @@ export default function Index(){
                         <div id="valuation" style={{padding: 20, width: "100%", display: "flex", flexDirection: "column",}}>
                             <h2 className="form-header" style={{color: "var(--font-color-active)"}}>Get an estimated valuation from us now!</h2>
                             <form>
+                                <span style={{fontSize: 24, color: "red"}}>{error.valuation}</span>
                                 <TextField
                                     name={"address"}
-                                    placeholder={"Postal Code / Address"}
+                                    placeholder={"Address"}
                                     styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
                                     onChange={(e) => updateValuationForm(e, "location")}
                                     containerStyle={{margin: 15}}
@@ -278,6 +329,7 @@ export default function Index(){
                                     onClickHandler={(e) => {
                                             //TODO: Send form request to server
                                             e.preventDefault();
+                                            submitValuation();
                                         }
                                     }
                                 />

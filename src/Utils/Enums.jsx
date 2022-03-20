@@ -226,7 +226,7 @@ export const search = {
     search: {
         roi: {
             center: "",
-            radius: 0.0
+            radius: 0.5
         },
         facilities: {
             musthave: [],

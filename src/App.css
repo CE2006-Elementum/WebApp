@@ -162,6 +162,7 @@
 
   .carousel-image-inner .landImg{
     min-height: 1295px;
+    max-height: 1295px;
   }
 
   .infoSlide, .infoSlide > div {
@@ -180,6 +181,7 @@
   
   .carousel-image-inner .landImg{
     min-height: 920px;
+    max-height: 920px;
   }
 
   .infoSlide, .infoSlide > div {
@@ -232,6 +234,7 @@
 
   .landImg {
     min-height: 845px;
+    max-height: 845px;
   }
 
   .landText {
