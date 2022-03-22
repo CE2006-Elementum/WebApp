@@ -4,6 +4,10 @@ import { Button, RadioButton, TextArea, TextField } from "../Components/InputFie
 import { contact } from '../Utils/Enums';
 import { postContactUs } from '../Utils/Fetch';
 
+/**
+ * Contact Us Page
+ * @returns A populated View
+ */
 export default function ContactUs(){
     const [contactForm, setContactForm] = useState({...contact});
     const [error, setError] = useState({error: ""});

@@ -8,6 +8,9 @@ import Valuation from "../Routes/Valuation";
 import FAQ from "../Routes/Faq";
 import ContactUs from "../Routes/ContactUs";
 
+/**
+ * Used to setup the router
+ */
 const links = [
   {
     to: "/",
@@ -36,6 +39,9 @@ const links = [
   },
 ]
 
+/**
+ * Used for top nav and footer nav
+ */
 export const mainNav = [
     <Link key={"home"} to="/" name="Home" style={{textDecoration: "none", fontSize: "18px", color: "var(--font-color-active)", margin: "15px 20px", fontWeight: 500}}>Home</Link>,
     <HashLink key={"location"} smooth to="/#locationFinder" name="Location Finder" style={{textDecoration: "none", fontSize: "18px", color: "var(--font-color-active)", margin: "15px 20px", fontWeight: 500}}>Location Finder</HashLink>,

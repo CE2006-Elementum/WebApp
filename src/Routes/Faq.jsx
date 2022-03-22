@@ -2,6 +2,10 @@ import React from 'react';
 
 import { faqAns } from '../Utils/Enums';
 
+/**
+ * FAQ Page
+ * @returns A populated View 
+ */
 export default function FAQ(){
     return (
         <div className="faq-container" style={{display: "flex", flexDirection: "column"}}>

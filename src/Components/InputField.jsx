@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Custom HTML Textfield
+ */
 export function TextField({name, placeholder, styles, onChange, containerStyle}) {
     return (
         <div style={containerStyle}>
@@ -8,6 +11,9 @@ export function TextField({name, placeholder, styles, onChange, containerStyle})
     );
 }
 
+/**
+ * Custom HTML Dropdown
+ */
 export function DropDown({name, styles, children, onChange}) {
     return (
         <div style={{margin: 15}}>
@@ -18,6 +24,9 @@ export function DropDown({name, styles, children, onChange}) {
     );
 }
 
+/**
+ * Custom HTML CheckBox
+ */
 export function CheckBox({label, onChange, enc}) {
     return (
         <div style={{display: "flex", flexDirection: "row", padding: 5}}>
@@ -27,6 +36,9 @@ export function CheckBox({label, onChange, enc}) {
     );
 }
 
+/**
+ * Custom HTML RadioButton
+ */
 export function RadioButton({label, onChange, name, value}) {
     return (
         <div style={{display: "flex", flexDirection: "row", padding: 5}}>
@@ -36,6 +48,9 @@ export function RadioButton({label, onChange, name, value}) {
     );
 }
 
+/**
+ * Custom HTML Slider
+ */
 export function RangeSlider({label, min, max, step, marks, onChange, units, tooltip}) {
     const Slider = require('rc-slider').default;
     const createSliderWithToolTip = Slider.createSliderWithTooltip;
@@ -84,6 +99,9 @@ export function RangeSlider({label, min, max, step, marks, onChange, units, tool
     );
 }
 
+/**
+ * Custom HTML Button
+ */
 export function Button({onClickHandler, containerStyles, buttonStyles, innerHTML}) {
     return (
         <div style={containerStyles}>
@@ -92,6 +110,9 @@ export function Button({onClickHandler, containerStyles, buttonStyles, innerHTML
     )
 }
 
+/**
+ * Custom HTML Textarea
+ */
 export function TextArea({name, placeholder, styles, onChange, containerStyle, rows, cols}) {
     return (
         <div style={containerStyle}>

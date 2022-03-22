@@ -2,6 +2,10 @@ import React from 'react';
 
 import { mainNav } from '../Utils/Routes';
 
+/**
+ * Bottom of page navigation
+ * @returns An JSX.Element
+ */
 export default function Footer(){
     return (
       <div className="footer-container" style={{display: "flex", flexDirection: "column", backgroundColor: "var(--font-color-inactive)", height: "100%", padding: 15, alignItems: "center"}}>

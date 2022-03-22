@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import Map from '../Components/Map';
 import { Marker } from '../Components/Marker';
 import ScrollableList from '../Components/ScrollableList';
 
+/**
+ * Search result page for Location Finder Form
+ * @returns A populated view
+ */
 export default function LocationFinder() {
-    const [pos, setPos] = useState();
     const { state } = useLocation();
+    const [pos, setPos] = useState(() => state.data.blocks.length > 0 ? {lat: state.data.blocks[0].basic.position.lat, lng: state.data.blocks[0].basic.position.lon} : null);
+    const [zoom, setZoom] = useState(15);
     let facilities = [];
     let blocks = [];
     let facilityMarkers = [];
@@ -42,6 +47,7 @@ export default function LocationFinder() {
     const listItemClickHandler = (newLat, newLng, e) => {
         e.preventDefault();
         setPos({lat: newLat, lng: newLng});
+        setZoom(20);
     }
 
     subscriber();
@@ -51,6 +57,19 @@ export default function LocationFinder() {
                 <div className="results-list" style={{display: "flex", flexDirection: "column", flex: 1.5, padding: 20}}>
                     <div style={{display: "flex", padding: 20}}>
                         <span style={{fontSize: "48px"}}>{ blocks.length > 0 ? "Here are the locations that we have found!" : "Sorry our search algorithm returned no results! Try refining your search criteria!"}</span>
+                    </div>
+                    <div style={{display: "flex", flexDirection: "column"}}>
+                        <address style={{padding: 15, fontWeight: 500}}>
+                            Legend
+                            <div style={{display: "flex", flexDirection: "row", padding: 5}}>
+                                <div style={{width: 20, height: 20, backgroundColor: "#af5cd9", borderRadius: 10}}/>
+                                <span style={{marginLeft: 5}}> - Blocks within search radius</span>
+                            </div>
+                            <div style={{display: "flex", flexDirection: "row", padding: 5}}>
+                                <div style={{width: 20, height: 20, backgroundColor: "#FF5cd9", borderRadius: 10}}/>
+                                <span style={{marginLeft: 5}}> - Facilities within search radius</span>
+                            </div>
+                        </address>
                     </div>
                     <ScrollableList>
                         {
@@ -67,7 +86,7 @@ export default function LocationFinder() {
                                                     })
                                                 }
                                             </ul>
-                                            <span>Proximate distance from starting location: {item.block_info.distance} km</span>
+                                            <span>Proximate distance from starting location: {Math.round(item.block_info.distance * 100) / 100} km</span>
                                         </div>
                                     </div>
                                 )
@@ -76,7 +95,7 @@ export default function LocationFinder() {
                     </ScrollableList>
                 </div>
                 <div className="google-map-container" id="gmap" style={{flex: 2, width: "100%", position: "relative", padding: 15, minHeight: "800px"}}>
-                        <Map defaultCenter={{lat: 1.3521, lng: 103.8198}} center={pos} zoom={15} mapStyle={{height: "100%", width: "100%"}}>
+                        <Map defaultCenter={{lat: 1.3521, lng: 103.8198}} defaultZoom={15} center={pos} zoom={zoom} mapStyle={{height: "100%", width: "100%"}}>
                             {
                                 blocks.map(item => {
                                     return (

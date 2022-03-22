@@ -3,14 +3,32 @@ import { Carousel as CarouselC } from 'react-responsive-carousel';
 
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
+/**
+ * Custom JS carousel
+ * @returns An JSX.Element
+ */
 export default function Carousel({imageList, imgHeight, children, showArrows, renderIndicator, dynamicHeight}) {
 
+    /**
+     * Custom arrow element
+     * @param {*} clickHandler Predefined
+     * @param {*} hasNext Predefined
+     * @param {*} label Predefined
+     * @returns An JSX.Element
+     */
     const customRenderNextArrow = (clickHandler, hasNext, label) => {
         return showArrows ? <div onClick={clickHandler} title={label} style={{position: 'absolute', zIndex: 2, top: 'calc(50% - 15px)', width: 30, height: 30, right: 15}}>
             <img src={require("../assets/db474e2803660d679789b4a6c20689bb.png")} alt="Next"/>
         </div> : null
     }
 
+    /**
+     * Custom arrow element
+     * @param {*} clickHandler Predefined
+     * @param {*} hasNext Predefined
+     * @param {*} label Predefined
+     * @returns An JSX.Element
+     */
     const customRenderPrevArrow = (clickHandler, hasNext, label) => {
         return showArrows ? <div onClick={clickHandler} title={label} style={{position: 'absolute', zIndex: 2, top: 'calc(50%)', width: 30, height: 30, left: 15}}>
             <img src={require("../assets/9a92df5583b2c2b4c8674728e44c2a79.png")} alt="Previous"/>

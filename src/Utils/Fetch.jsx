@@ -11,7 +11,7 @@ const SERVER = "http://127.0.0.1:" + PORT;
 export const fetchSearchRequest = async(data) => {
     const req = new Request(SERVER + "/search", {
         headers: {
-            "Content-Type": "application/json, text/plain, */*", 
+            "Content-Type": "application/json", 
             "Accept": "application/json"
         },
         method: "POST",
@@ -29,10 +29,11 @@ export const fetchSearchRequest = async(data) => {
 export const fetchValuationRequest = async(data) => {
     const req = new Request(SERVER + "/valuation", {
         headers: {
-            "Content-Type": "application/json, text/plain, */*", 
+            "Content-Type": "application/json", 
             "Accept": "application/json"
         },
         method: "POST",
+        cache: "no-cache",
         body: JSON.stringify(data),
     });
     return fetch(req);
@@ -45,7 +46,7 @@ export const fetchValuationRequest = async(data) => {
 export const fetchGMapsAPIKey = async() => {
     const req = new Request(SERVER + "/mapskey", {
         headers: {
-            "Content-Type": "application/json, text/plain, */*",
+            "Content-Type": "application/json",
             "Accept": "application/json"
         },
         method: "GET",
@@ -62,7 +63,7 @@ export const fetchGMapsAPIKey = async() => {
 export const postContactUs = async(data) => {
     const req = new Request(SERVER + "/feedback", {
         headers: {
-            "Content-Type": "application/json, text/plain, */*",
+            "Content-Type": "application/json",
             "Accept": "application/json"
         },
         method: "POST",

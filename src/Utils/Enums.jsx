@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Enum for dropdown list for room type
+ */
 export const flatType = [
     {
         label: "1-Room", 
@@ -31,6 +34,9 @@ export const flatType = [
     }
 ]
 
+/**
+ * Demarker for slider
+ */
 export const rangeMarks = {
     0.1:  "0.1",
     0.2:  "0.2",
@@ -54,6 +60,9 @@ export const rangeMarks = {
     2.0: "2.0",
 }
 
+/**
+ * Accordion info for locationfinder form
+ */
 export const accordionInfo = [
     {
         title: "Recreational Facilities",
@@ -75,7 +84,7 @@ export const accordionInfo = [
                 },
                 {
                     label: "Bus Interchanges",
-                    enc: "ts_bus_interchanges"
+                    enc: "ts_bus_interchange"
                 },
                 {
                     label: "MRT & LRT Stations",
@@ -92,7 +101,7 @@ export const accordionInfo = [
                     enc: "hc_clinic"
                 },
                 {
-                    label: "Ployclinics",
+                    label: "Polyclinics",
                     enc: "hc_polyclinic"
                 },
                 {
@@ -129,6 +138,9 @@ export const accordionInfo = [
     }
 ]
 
+/**
+ * Info used in landing page carousel
+ */
 export const carouselLanding = [
     {
         image: require("../assets/9017bd11de396347fe96bc9c622d2aa8.jpg"),
@@ -147,12 +159,18 @@ export const carouselLanding = [
     }
 ];
 
+/**
+ * Info for carousel beside home page form
+ */
 export const carouselInfo = [
     {
         image: require("../assets/8ae91f6abc33048928f3daebb152af9f.jpg")
     }
 ];
 
+/**
+ * Info for FAQ
+ */
 export const faqAns = [
     {
         class: "faq-general",
@@ -222,6 +240,9 @@ export const faqAns = [
     }
 ]
 
+/**
+ * Template for locationfinder form submission
+ */
 export const search = {
     search: {
         roi: {
@@ -250,6 +271,9 @@ export const search = {
     }
 }
 
+/**
+ * Template for valuation form submission
+ */
 export const valuation = {
     valuation: {
         location: "",
@@ -258,6 +282,9 @@ export const valuation = {
     }
 }
 
+/**
+ * Template for contact form submission
+ */
 export const contact = {
     contact: {
         firstName: "",

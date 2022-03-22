@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 
+/**
+ * Custom Accordion
+ * @returns An JSX.Element
+ */
 export default function Accordion({data, styles, children}) {
     const [isActive, setIsActive] = useState(false);
     
