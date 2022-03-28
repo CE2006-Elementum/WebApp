@@ -11,7 +11,7 @@ import { postContactUs } from '../Utils/Fetch';
 export default function ContactUs(){
     const [contactForm, setContactForm] = useState({...contact});
     const [error, setError] = useState({error: ""});
-    const [res, setRes] = useState({result: ""})
+    const [res, setRes] = useState({result: ""});
 
     /**
      * Contact Us Form handler to prepare the request that is to be sent on click
@@ -31,21 +31,21 @@ export default function ContactUs(){
      */
     const submitContactForm = () => {
         setError({error: ""});
-        if(contactForm.contact.firstName === "" || contactForm.contact.firstName === null
-            || contactForm.contact.lastName === "" || contactForm.contact.last === null
+        if(contactForm.contact.first_name === "" || contactForm.contact.first_name === null
+            || contactForm.contact.last_name === "" || contactForm.contact.last_name === null
             || contactForm.contact.message === "" || contactForm.contact.message === null
-            || contactForm.contact.mobile === "" || contactForm.contact.mobile === null) {
+            || contactForm.contact.email === "" || contactForm.contact.email === null
+            || contactForm.contact.role === "" || contactForm.contact.role === null
+            || contactForm.contact.phone === "" || contactForm.contact.phone === null) {
             setError({error: "Please ensure that all fields are filled!"});
             return;
         }
         postContactUs(contactForm.contact).then(response => {
             if(response.status === 200)
-                return response.json();
+                setRes({result: "Success!"});
             else setError({error: "Error! " + response.status});
-        }).then(response => {
-            if(response)
-                setRes({result: response});
-        })
+        });
+        setContactForm({...contactForm});
     }
     
     return (
@@ -53,91 +53,103 @@ export default function ContactUs(){
             <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginTop: 50, padding: 20, flexWrap: "wrap"}}>
                 <div style={{display: "flex", flexDirection: "column", margin: "auto", flexWrap: "wrap"}}>
                     <h3 className="title">Contact Us</h3>
-                    <span>{error.error}</span>
-                    <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginBottom: 20}}>
-                        <div style={{display: "flex", flexDirection: "column", marginRight: 20}}>
-                            <label className="input-label" htmlFor="firstName">Name *</label>
-                            <TextField
-                                name="firstName"
-                                styles={{width: "300px"}}
-                                onChange={(e) => updateContactForm(e, "firstName")}
-                            />
-                            <label className="input-label-sub" htmlFor="firstName" style={{fontSize: "12px"}}>First Name</label>
+                    <span aria-label="contactError">{error.error ? error.error : res.result ? res.result : ""}</span>
+                    <form>
+                        <div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginBottom: 20}}>
+                            <div style={{display: "flex", flexDirection: "column", marginRight: 20}}>                                
+                                <TextField
+                                    name={"first_name"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "first_name")}
+                                />
+                                <label className="input-label-sub" htmlFor="first_name" style={{fontSize: "12px"}}>First Name</label>
+                            </div>
+                            <div style={{display: "flex", flexDirection: "column",}}>
+                                <TextField
+                                    name={"last_name"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "last_name")}
+                                />
+                                <label className="input-label-sub" htmlFor="last_name" style={{fontSize: "12px"}}>Last Name</label>
+                            </div>
                         </div>
-                        <div style={{display: "flex", flexDirection: "column",}}>
-                            <label className="input-label" htmlFor="lastName" style={{fontSize: "16px"}}>&#160;</label>
-                            <TextField
-                                name="lastName"
-                                styles={{width: "300px"}}
-                                onChange={(e) => updateContactForm(e, "lastName")}
-                            />
-                            <label className="input-label-sub" htmlFor="lastName" style={{fontSize: "12px"}}>Last Name</label>
+                        <div style={{display: "flex", marginBottom: 30}}>
+                            <div stlye={{display: "flex", flexDirection: "column"}}>
+                                <label className="input-label" htmlFor="mobileNo">Mobile Number *</label>
+                                <TextField
+                                    name={"mobileNo"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "phone")}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div style={{display: "flex", marginBottom: 30}}>
-                        <div stlye={{display: "flex", flexDirection: "column"}}>
-                            <label className="input-label" htmlFor="mobileNo">Mobile Number *</label>
-                            <TextField
-                                name="mobileNo"
-                                styles={{width: "300px"}}
-                                onChange={(e) => updateContactForm(e, "mobile")}
+                        <div style={{display: "flex", marginBottom: 30}}>
+                            <div stlye={{display: "flex", flexDirection: "column"}}>
+                                <label className="input-label" htmlFor="email">Email *</label>
+                                <TextField
+                                    name={"email"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "email")}
+                                />
+                            </div>
+                        </div>
+                        <div style={{display: "flex", flexDirection: "column", marginBottom: 20}}>
+                            <label className="input-label" htmlFor="asRole">Enquiring as *</label>
+                            <RadioButton
+                                label={"Buyer"}
+                                name={"asRole"}
+                                value={"buyer"}
+                                onChange={(e) => updateContactForm(e, "role")}
+                            />
+                            <RadioButton
+                                label={"Seller"}
+                                name={"asRole"}
+                                value={"seller"}
+                                onChange={(e) => updateContactForm(e, "role")}
+                            />
+                            <RadioButton
+                                label={"Agent"}
+                                name={"asRole"}
+                                value={"agent"}
+                                onChange={(e) => updateContactForm(e, "role")}
                             />
                         </div>
-                    </div>
-                    <div style={{display: "flex", flexDirection: "column", marginBottom: 20}}>
-                        <label className="input-label" htmlFor="as">Enquiring as *</label>
-                        <RadioButton
-                            label="Buyer"
-                            name="as"
-                            value="buyer"
-                            onChange={(e) => updateContactForm(e, "enquiringAs")}
-                        />
-                        <RadioButton
-                            label="Seller"
-                            name="as"
-                            value="seller"
-                            onChange={(e) => updateContactForm(e, "enquiringAs")}
-                        />
-                        <RadioButton
-                            label="Agent"
-                            name="as"
-                            value="agent"
-                            onChange={(e) => updateContactForm(e, "enquiringAs")}
-                        />
-                    </div>
-                    <div style={{display: "flex", flexDirection: "column", marginBottom: 30}}>
-                        <label className="input-label" htmlFor="msg">Message *</label>
-                        <TextArea
-                            rows="10"
-                            cols="85"
-                            onChange={(e) => updateContactForm(e, "message")}
-                        />
-                    </div>
-                    <div style={{display: "flex", marginBottom: 30}}>
-                        <Button
-                            innerHTML="SEND"
-                            buttonStyles={
-                                {
-                                    height: 36,
-                                    padding: 20,
-                                    fontSize: 16,
-                                    backgroundColor: "#D48472",
-                                    border: "none",
-                                    borderRadius: 10,
-                                    color: "var(--font-color-light)",
-                                    fontWeight: 500,
-                                    display: "flex",
-                                    alignItems: "center"
+                        <div style={{display: "flex", flexDirection: "column", marginBottom: 30}}>
+                            <label className="input-label" htmlFor="msg">Message *</label>
+                            <TextArea
+                                ariaLabel={"message"}
+                                rows="10"
+                                cols="85"
+                                onChange={(e) => updateContactForm(e, "message")}
+                            />
+                        </div>
+                        <div style={{display: "flex", marginBottom: 30}}>
+                            <Button
+                                aria-label="contactButton"
+                                innerHTML={"SEND"}
+                                buttonStyles={
+                                    {
+                                        height: 36,
+                                        padding: 20,
+                                        fontSize: 16,
+                                        backgroundColor: "#D48472",
+                                        border: "none",
+                                        borderRadius: 10,
+                                        color: "var(--font-color-light)",
+                                        fontWeight: 500,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        zIndex: 1000
+                                    }
                                 }
-                            }
-                            onClick={(e) => {
-                                //TODO: Send form request to server
-                                e.preventDefault();
-                                submitContactForm();
-                            }}
-                        />
-                        <span>{res.result}</span>
-                    </div>
+                                onClickHandler={(e) => {
+                                    //TODO: Send form request to server
+                                    e.preventDefault();
+                                    submitContactForm();
+                                }}
+                            />
+                        </div>
+                    </form>
                     <div style={{display: "flex", flexDirection: "column", marginBottom: 20}}>
                         <h4 className="info">Customer support</h4>
                         <address>cs@elementum.sg</address>
@@ -147,9 +159,8 @@ export default function ContactUs(){
                 </div>
                 <div style={{display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", margin: "auto"}}>
                     <div>
-                        <img className="logo" src={require("../assets/06bacb2d15838ff39a30359cac950d36.png")} alt="Logo" style={{width: "100px", height: "100px"}}/>
+                        <img className="logo" src={require("../assets/06bacb2d15838ff39a30359cac950d36.png")} alt="Logo" style={{width: "150px", height: "150px"}}/>
                     </div>
-                    <h3 className="brand">Elementum Housing</h3>
                     <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                         <h3 className="info">Singapore Head Office</h3>
                         <address>Nanyang Technological University</address>

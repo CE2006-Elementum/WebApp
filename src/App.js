@@ -1,9 +1,10 @@
 import './App.css';
-import { Outlet, } from 'react-router-dom';
+import React from 'react';
+import { Outlet, Route, BrowserRouter as Router, Routes, } from 'react-router-dom';
 
 import MainNav from './Components/MainNav';
 import Footer from './Components/Footer';
-import { mainNav } from "./Utils/Routes";
+import links, { mainNav } from "./Utils/Routes";
 
 export function Layout({children}) {
   return (
@@ -19,11 +20,20 @@ export function Layout({children}) {
   )
 }
 
-function App() {
+function App({history}) {
   return (
+    <Router history={history}>
       <Layout>
-        <Outlet />
+        <Outlet/>
+        <Routes>
+          {
+            links.map((route, index) => {
+              return <Route path={route.to} element={route.element} key={index}/>
+            })
+          }
+        </Routes>
       </Layout>
+  </Router>
   );
 }
 

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useMediaQuery } from 'beautiful-react-hooks';
 import { HashLink } from 'react-router-hash-link';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,7 +13,6 @@ import { fetchSearchRequest, fetchValuationRequest } from '../Utils/Fetch';
  */
 export default function Index(){
     const navigate = useNavigate();
-    const tooSmall = useMediaQuery('(max-width: 768px)');
     const [searchForm, setSearchForm] = useState({...search});
     const [valuationForm, setValuationForm] = useState({...valuation});
     const [error, setError] = useState({search: "", valuation: ""});
@@ -96,9 +94,8 @@ export default function Index(){
                 return response.json();
             else setError({...error, search: "Error! " + response.status + " Please contact our support team!"});
         }).then(response => {
-            if(response)
-                navigate('/locationfinder', {state: {data: response}});
-        })
+            navigate('/locationfinder', {state: {data: response}});
+        });
     }
 
     /**
@@ -113,18 +110,17 @@ export default function Index(){
                 return;
             }
         fetchValuationRequest(valuationForm.valuation).then(response => {
-            if(response.status === 200)
+            if(response.status === 200)                
                 return response.json();
             else setError({...error, valuation: "Error! " + response.status + " Please contact our support team!"});
         }).then(response => {
-            if(response)
-                navigate('/valuation', {state: {data: response}});
-        })
+            navigate('/valuation', {state: {data: response}});
+        });
     }
 
 
     return (
-        <div className="container" style={{display: "flex", flexDirection: "column"}}>
+        <div aria-label="container" className="container" style={{display: "flex", flexDirection: "column"}}>
             <Carousel showArrows={true}>
                 {
                     carouselLanding.map(element => {
@@ -206,9 +202,9 @@ export default function Index(){
                         <div id="locationFinder" style={{padding: 20, width: "100%", display: "flex", flexDirection: "column",}}>
                             <h2 className="form-header" style={{color: "var(--font-color-active)"}}>Start searching for your dream home location with us!!</h2>
                             <form>
-                                <span style={{fontSize: 24, color: "red"}}>{error.search}</span>
+                                <span aria-label="searchError" style={{fontSize: 24, color: "red"}}>{error.search}</span>
                                 <TextField
-                                    name={"address"}
+                                    name={"address1"}
                                     placeholder={"Address"}
                                     styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
                                     onChange={(e) => {updateLocationFinderForm(e, "roi.center")}}
@@ -235,19 +231,15 @@ export default function Index(){
                                                     return <CheckBox key={type.label + type.enc} label={type.label} enc={type.enc} onChange={(e) => updateLocationFinderForm(e, "flat_properties.room_types")}/>
                                                 })
                                             }
-                                            <RangeSlider label={"Floors"} min={1} max={25} step={1} onChange={(e) => updateLocationFinderForm(e, "flat_properties.storey_range.max")}/>
-                                            <RangeSlider label={"Floor Area (sqm)"} min={20} max={300} step={10} onChange={(e) => updateLocationFinderForm(e, "flat_properties.area_range.max")}/>
-                                            <RangeSlider label={"Price (million)"} min={0.1} max={2.0} step={0.1} onChange={(e) => updateLocationFinderForm(e, "flat_properties.price_range.max")}/>
+                                            <RangeSlider name="Floors" label="Floors" min={1} max={25} step={1} onChange={(e) => updateLocationFinderForm(e, "flat_properties.storey_range.max")}/>
+                                            <RangeSlider name="Floor Area (sqm)" label="FAsqm" min={20} max={300} step={10} onChange={(e) => updateLocationFinderForm(e, "flat_properties.area_range.max")}/>
+                                            <RangeSlider name="Price (million)" label="Price" min={0.1} max={2.0} step={0.1} onChange={(e) => updateLocationFinderForm(e, "flat_properties.price_range.max")}/>
                                         </div>
                                     </Accordion>
-                                    { 
-                                        tooSmall ? 
-                                            <RangeSlider label={"Range"} min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseFloat(e), "facilities.distance")} units={"km"}/> 
-                                            :  
-                                            <RangeSlider label={"Range"} min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseFloat(e), "facilities.distance")} marks={rangeMarks} units={"km"}/> 
-                                    }
+                                    <RangeSlider name="Range" label="Range" min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseFloat(e), "facilities.distance")} marks={rangeMarks} units={"km"}/>
                                 </div>
                                 <Button 
+                                    aria-label="searchButton"
                                     innerHTML={"Find me some locations!"}
                                     buttonStyles={
                                         {
@@ -282,9 +274,9 @@ export default function Index(){
                         <div id="valuation" style={{padding: 20, width: "100%", display: "flex", flexDirection: "column",}}>
                             <h2 className="form-header" style={{color: "var(--font-color-active)"}}>Get an estimated valuation from us now!</h2>
                             <form>
-                                <span style={{fontSize: 24, color: "red"}}>{error.valuation}</span>
+                                <span aria-label="valueError" style={{fontSize: 24, color: "red"}}>{error.valuation}</span>
                                 <TextField
-                                    name={"address"}
+                                    name={"address2"}
                                     placeholder={"Address"}
                                     styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
                                     onChange={(e) => updateValuationForm(e, "location")}
@@ -308,7 +300,8 @@ export default function Index(){
                                         })
                                     }
                                 </DropDown>
-                                <Button 
+                                <Button
+                                    aria-label="valuationButton"
                                     innerHTML={"Calculate my property’s value"}
                                     buttonStyles={
                                         {

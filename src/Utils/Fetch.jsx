@@ -33,7 +33,6 @@ export const fetchValuationRequest = async(data) => {
             "Accept": "application/json"
         },
         method: "POST",
-        cache: "no-cache",
         body: JSON.stringify(data),
     });
     return fetch(req);
@@ -50,7 +49,6 @@ export const fetchGMapsAPIKey = async() => {
             "Accept": "application/json"
         },
         method: "GET",
-        cache: "only-if-cached"
     });
     return fetch(req);
 }

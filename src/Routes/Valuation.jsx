@@ -1,15 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { Marker } from '../Components/Marker';
 import Map from '../Components/Map';
 import ScrollableList from '../Components/ScrollableList';
+import { valuationTemp } from '../Utils/Enums';
 
 export default function Valuation() {
     const { state } = useLocation();
-    const property = state.data;
-    const [pos, setPos] = useState({lat: property.position.lat, lng: property.position.lon});
+    const property = useRef(valuationTemp);
+    const [pos, setPos] = useState();
     const [zoom, setZoom] = useState(15);
+    const [loading, setLoading] = useState(true);
+
+    /**
+     * Runs onload
+     */
+    useEffect(() => {
+        subscriber();
+        return () => {}
+    }, [state]);
+
+    
+    const subscriber = () => {
+        if(state.data.nearby_valuations.length > 0) {
+            property.current = state.data;
+            setPos(() => property.current ? {lat: property.current.position.lat, lng: property.current.position.lon} : null);
+        }
+        setLoading(false);
+    };
 
     /**
      * Handles on click of list item
@@ -22,13 +41,14 @@ export default function Valuation() {
         setPos({lat: newLat, lng: newLng});
         setZoom(20);
     }
-    
+
     return (
-        <div className="result-container" style={{display: "flex", flexDirection: "column", backgroundImage: "linear-gradient(to bottom, #F8F1E4, #FFFFFF)"}}>
+        loading ? null :
+        <div aria-label="valuation-result-container" className="result-container" style={{display: "flex", flexDirection: "column", backgroundImage: "linear-gradient(to bottom, #F8F1E4, #FFFFFF)"}}>
             <div className="results" style={{display: "flex", flexDirection: "row", justifyContent: "center", width: "100%", marginTop: 100}}>
                 <div className="results-list" style={{display: "flex", flexDirection: "column", flex: 1.5, padding: 20}}>
                     <div style={{display: "flex", padding: 20}}>
-                        <span style={{fontSize: "48px"}}>{ property ? "Your property's estimated valuation is.... S$" + Math.round(property.valuation * 100) / 100 + " million": "Sorry our search algorithm returned no results! Try refining your search criteria!"}</span>
+                        <span aria-label="valuationText" style={{fontSize: "48px"}}>{ property.current ? "Your property's estimated valuation is.... S$" + Math.round(property.current.valuation * 100) / 100 + " million": "Sorry our search algorithm returned no results! Try refining your search criteria!"}</span>
                     </div>
                     <div style={{display: "flex", flexDirection: "column"}}>
                         <address style={{padding: 15, fontWeight: 500}}>
@@ -42,10 +62,10 @@ export default function Valuation() {
                                 <span style={{marginLeft: 5}}> - Properties within search radius</span>
                             </div>
                         </address>
-                    </div>
+                    </div>                    
                     <ScrollableList>
                         {
-                            property.nearby_valuations.map((item, index) => {
+                            property.current.nearby_valuations.map((item, index) => {
                                 return (
                                     <div key={item.block.name} style={{border: "1px solid black", borderRadius: 5, backgroundImage: "linear-gradient(to right, #FBDDAD, #FFFFFF)",}} onClick={(e) => listItemClickHandler(item.block.position.lat, item.block.position.lon, e)}>
                                         <div style={{marginLeft: 10, padding: 5, display: "flex", flexDirection:"column"}}>
@@ -56,15 +76,15 @@ export default function Valuation() {
                                 )
                             })
                         }
-                    </ScrollableList>
+                        </ScrollableList>                    
                 </div>
                 <div className="google-map-container" id="gmap" style={{flex: 2, width: "100%", position: "relative", padding: 15, minHeight: "800px"}}>
                         <Map defaultCenter={{lat: 1.3521, lng: 103.8198}} defaultZoom={15} center={pos} zoom={zoom} mapStyle={{height: "100%", width: "100%"}}>
-                            <Marker color={"rgb(237 46 99)"} lat={property.position.lat} lng={property.position.lon}/>
+                            <Marker color={"rgb(237 46 99)"} lat={property.current.position.lat} lng={property.current.position.lon}/>
                             {
-                                property.nearby_valuations.map(item => {
+                                property.current.nearby_valuations.map((item, index) => {
                                     return (
-                                        <Marker color={"#af5cd9"} lat={item.block.position.lat} lng={item.block.position.lon}/>
+                                        <Marker key={index * item.block.position.lat + item.block.position.lon} color={"#af5cd9"} lat={item.block.position.lat} lng={item.block.position.lon}/>
                                     )
                                 })
                             }

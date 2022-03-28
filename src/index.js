@@ -2,28 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route
-} from 'react-router-dom';
-import {
-  Layout
-} from './App';
-import links from './Utils/Routes';
+import App from './App';
 
 ReactDOM.render(
-  <Router>
-    <Layout>
-    <Routes>
-      {
-        links.map((route, index) => {
-          return <Route path={route.to} element={route.element} key={index}/>
-        })
-      }
-    </Routes>
-    </Layout>
-  </Router>,
+  <App/>,
   document.getElementById('root')
 );
 

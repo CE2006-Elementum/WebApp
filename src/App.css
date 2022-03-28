@@ -9,6 +9,10 @@
   --font-color-active: #1d1d1d;
 }
 
+.css-187mznn-MuiSlider-root {
+  color: var(--font-color-dark) !important;
+}
+
 .form-groups > .Carousel-container > .carousel-root {
   width: 75%
 }
