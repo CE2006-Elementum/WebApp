@@ -4,7 +4,6 @@ import { useLocation } from 'react-router-dom';
 import Map from '../Components/Map';
 import { Marker } from '../Components/Marker';
 import ScrollableList from '../Components/ScrollableList';
-import { facilitiesTemp, blocksTemp, facilityMarkerTemp } from '../Utils/Enums';
 
 /**
  * Search result page for Location Finder Form
@@ -12,43 +11,15 @@ import { facilitiesTemp, blocksTemp, facilityMarkerTemp } from '../Utils/Enums';
  */
 export default function LocationFinder() {
     const { state } = useLocation();
-    console.log(state)
     const [pos, setPos] = useState();
     const [zoom, setZoom] = useState(15);
-    const [loading, setLoading] = useState(true);
-    const facilities = useRef([]);
     const blocks = useRef([]);
     const facilityMarkers = useRef([]);
 
-    useEffect(() => {    
-        subscriber();
-    return () => {};
+    useEffect(() => {
+        blocks.current = state.blocks;
+        facilityMarkers.current = state.facilityMarkers;
     }, [state]);
-
-    /**
-     * Transforms the data received from the server
-     */
-     const subscriber = () => {
-        if(state.data.blocks.length > 0) {
-            const data = {...state.data}; //Shallow copy
-            data.blocks.forEach(block => {
-                facilities.current = [];
-                block.facilities.forEach(facility => {
-                    if(facilities.current.length === 0 || facilities.current.find(item => item.id === facility) === undefined)
-                        facilities.current.push({id: facility, info: data.facility_info[facility]});
-                });
-                blocks.current.push({block_info: block, facility_info: facilities.current});
-            });
-            blocks.current.forEach(item => {
-                item.facility_info.forEach(facility => {
-                    if(facilityMarkers.current.length === 0 || facilityMarkers.current.find(item => item.id === facility.id) === undefined)
-                        facilityMarkers.current.push({id: facility.id, lat: facility.info.position.lat, lng: facility.info.position.lon});
-                })
-            });
-            setPos({lat: state.data.blocks[0].basic.position.lat, lng: state.data.blocks[0].basic.position.lon});
-        }
-        setLoading(false);
-    };
     
     /**
      * Handles on click of list item
@@ -63,7 +34,6 @@ export default function LocationFinder() {
     }
 
     return (
-        loading ? null : 
         <div aria-label="search-result-container" className="result-container" style={{display: "flex", flexDirection: "column", backgroundImage: "linear-gradient(to bottom, #F8F1E4, #FFFFFF)"}}>
             <div className="results" style={{display: "flex", flexDirection: "row", justifyContent: "center", width: "100%", marginTop: 100}}>
                 <div className="results-list" style={{display: "flex", flexDirection: "column", flex: 1.5, padding: 20}}>
@@ -85,7 +55,7 @@ export default function LocationFinder() {
                     </div>
                     
                         {
-                            blocks.current.length > 0? <ScrollableList>
+                            blocks.current.length > 0 ? <ScrollableList>
                                 {
                                     blocks.current.map((item, index) => {
                                         return (
@@ -95,9 +65,9 @@ export default function LocationFinder() {
                                                     <span style={{fontSize: 24, fontWeight: 600}}>Facilities</span>
                                                     <ul>
                                                         {
-                                                            item.facility_info.map((facility, index) => {
+                                                            item.facility_info.length > 0 ? item.facility_info.map((facility, index) => {
                                                                 return <li key={facility.info.name + item.block_info.basic.name}>{facility.info.name}</li>
-                                                            })
+                                                            }) : null
                                                         }
                                                     </ul>
                                                     <span>Proximate distance from starting location: {Math.round(item.block_info.distance * 100) / 100} km</span>
@@ -112,18 +82,18 @@ export default function LocationFinder() {
                 <div className="google-map-container" id="gmap" style={{flex: 2, width: "100%", position: "relative", padding: 15, minHeight: "800px"}}>
                         <Map defaultCenter={{lat: 1.3521, lng: 103.8198}} defaultZoom={15} center={pos} zoom={zoom} mapStyle={{height: "100%", width: "100%"}}>
                             {
-                                blocks.current.map((item, index) => {
+                                blocks.current.length > 0 ? blocks.current.map((item, index) => {
                                     return (
                                         <Marker key={index * item.block_info.basic.position.lat + item.block_info.basic.position.lon} color={"#af5cd9"} lat={item.block_info.basic.position.lat} lng={item.block_info.basic.position.lon}/>
                                     )
-                                })
+                                }) : null
                             }
                             {
-                                facilityMarkers.current.map(item => {
+                                facilityMarkers.current.length > 0 ? facilityMarkers.current.map(item => {
                                     return (
                                         <Marker key={item.lat + item.lng} color={"#FF5cd9"} lat={item.lat} lng={item.lng}/>
                                     )
-                                })
+                                }) : null
                             }
                         </Map>
                 </div>

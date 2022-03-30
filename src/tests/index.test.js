@@ -1,11 +1,13 @@
 import React from 'react';
-import { render, fireEvent, screen, cleanup, waitFor } from '@testing-library/react';
+import { render, fireEvent, screen, cleanup, waitFor, prettyDOM } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { createMemoryHistory } from 'history';
 
 import App from '../App.js';
 import { server } from './mockserver.jsx';
 import { act } from 'react-dom/test-utils';
+import LocationFinder from '../Routes/LocationFinder.jsx';
+import { searchRes } from './testdata.jsx';
 
 let history;
 
@@ -140,10 +142,13 @@ describe("Landing page test suite", () => {
         expect(screen.getAllByLabelText(/Range/i)[0]).toHaveDisplayValue(0.5);
 
         fireEvent.click(button); //SIMULATE FORM SUBMISSION
-        await act(async() => {
-            expect(await screen.findByText("Here are the locations that we have found!")).toBeInTheDocument();
-            //END ASSERTION CHECKS
-        });
+        setTimeout(async() => {
+            await waitFor(() => {
+                expect(screen.getByLabelText(/search-result-container/i)).toBeInTheDocument();
+            });
+            expect(screen.getByText("Here are the locations that we have found!")).toBeInTheDocument();
+        }, 1000);
+        //END ASSERTION CHECKS
     });
 
     it("Valuation - Should fail validaiton and receive no server response", async() => {
@@ -188,9 +193,12 @@ describe("Landing page test suite", () => {
         expect(screen.getAllByLabelText(/flatType/i)[0]).toHaveDisplayValue("5-Room");
 
         fireEvent.click(button); //SIMULATE FORM SUBMISSION
-        await act(async() => {
-            expect(await screen.findByLabelText(/valuationText/)).toBeInTheDocument();
-        });
+        setTimeout(async() => {
+            await act(async() => {
+                expect(await screen.findByLabelText(/valuationText/)).toBeInTheDocument();
+            });
+            expect(screen.getByText(/Sold at: S$/i)).toBeInTheDocument();
+        }, 1000);
         //END ASSERTION CHECKS
     });
 });

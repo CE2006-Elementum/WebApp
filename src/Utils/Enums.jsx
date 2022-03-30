@@ -3,7 +3,7 @@ import React from 'react';
 
 const position = {
     lat: 0.0,
-    lng: 0.0
+    lon: 0.0
 }
 
 const block_info = {
@@ -321,16 +321,16 @@ export const blocksTemp = {
     block_info: {
         basic: block_info,
         distance: 0.0,
-        facilities: [""],
-        flat: [""],
-        facility_info: facilitiesTemp
-    }
+        facilities: [],
+        flat: [],
+    },
+    facility_info: [facilitiesTemp]
 }
 
 export const facilityMarkerTemp = {
     id: 0,
     lat: position.lat,
-    lng: position.lng
+    lng: position.lon
 }
 
 export const valuationTemp = {

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { HashLink } from 'react-router-hash-link';
 import { useNavigate } from 'react-router-dom';
 
 import Accordion from '../Components/Accordion';
 import Carousel from '../Components/Carousel';
 import { DropDown, TextField, Button, RangeSlider, CheckBox } from '../Components/InputField';
-import { flatType, carouselLanding, carouselInfo, accordionInfo, rangeMarks, search, valuation } from '../Utils/Enums';
+import { flatType, carouselLanding, carouselInfo, accordionInfo, rangeMarks, search, valuation, facilitiesTemp, blocksTemp, facilityMarkerTemp } from '../Utils/Enums';
 import { fetchSearchRequest, fetchValuationRequest } from '../Utils/Fetch';
 
 /**
@@ -16,6 +16,10 @@ export default function Index(){
     const [searchForm, setSearchForm] = useState({...search});
     const [valuationForm, setValuationForm] = useState({...valuation});
     const [error, setError] = useState({search: "", valuation: ""});
+    let facilities = [];
+    let blocks = [];
+    let facilityMarkers = [];
+    let property = [];
 
     /**
      * Custom Carousel Indicator for form selection
@@ -94,7 +98,8 @@ export default function Index(){
                 return response.json();
             else setError({...error, search: "Error! " + response.status + " Please contact our support team!"});
         }).then(response => {
-            navigate('/locationfinder', {state: {data: response}});
+            subscriberSearch(response);
+            navigate('/locationfinder', {state: {blocks, facilities, facilityMarkers}});
         });
     }
 
@@ -109,15 +114,46 @@ export default function Index(){
                 setError({...error, valuation: "Please check if you've filled in all fields."});
                 return;
             }
-        fetchValuationRequest(valuationForm.valuation).then(response => {
-            if(response.status === 200)                
+        fetchValuationRequest(valuationForm.valuation).then(response => {           
                 return response.json();
-            else setError({...error, valuation: "Error! " + response.status + " Please contact our support team!"});
         }).then(response => {
-            navigate('/valuation', {state: {data: response}});
+            if(response.detail === undefined) {
+                subscriberValuation(response);
+                navigate('/valuation', {state: {property}});
+            }
+            setError({...error, valuation: "Error: " + response.title + ". Error Details: " + response.detail});
         });
-    }
+    };
 
+    const subscriberSearch = (response) => {
+        blocks = [];
+        if(response.blocks.length > 0) {
+            const data = {...response}; //Shallow copy
+            data.blocks.forEach(block => {
+                facilities = [];
+                block.facilities.forEach(facility => {
+                    if(facilities.length === 0 || facilities.find(item => item.id === facility) === undefined)
+                        facilities.push({id: facility, info: data.facility_info[facility]});
+                });
+                blocks.push({block_info: block, facility_info: facilities});
+            });
+            if(blocks[0].facility_info.length > 0) {
+                facilityMarkers = [];
+                blocks.forEach(item => {
+                    item.facility_info.forEach(facility => {
+                        if(facilityMarkers.length === 0 || facilityMarkers.find(item => item.id === facility.id) === undefined)
+                            facilityMarkers.push({id: facility.id, lat: facility.info.position.lat, lng: facility.info.position.lon});
+                    })
+                });
+            }
+        }
+    };
+
+    const subscriberValuation = (response) => {
+        if(response.nearby_valuations.length > 0) {
+            property = response;
+        }
+    };
 
     return (
         <div aria-label="container" className="container" style={{display: "flex", flexDirection: "column"}}>

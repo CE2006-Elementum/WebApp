@@ -74,9 +74,12 @@ describe("Contact Us test suite", () => {
         expect(role).toBeChecked();
         expect(msg).toHaveDisplayValue("Test Message");
         fireEvent.click(button);
-        
 
-        
+        setTimeout(async() => {
+            await waitFor(async() => {
+                expect(screen.getByLabelText(/contactError/i)).toHaveTextContent("Success");
+            })
+        }, 1000);
         //END ASSERTION CHECKS
     })
 })
