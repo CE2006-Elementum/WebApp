@@ -20,7 +20,7 @@ export function Layout({children}) {
   )
 }
 
-function App({history}) {
+function App({history, testURL}) {
   return (
     <Router history={history}>
       <Layout>
@@ -28,7 +28,7 @@ function App({history}) {
         <Routes>
           {
             links.map((route, index) => {
-              return <Route path={route.to} element={route.element} key={index}/>
+              return <Route path={route.to} element={ process.env.NODE_ENV === "test" ? React.cloneElement(route.element, {testFetchURL: testURL}) : route.element } key={index}/>
             })
           }
         </Routes>

@@ -8,8 +8,8 @@ const SERVER = "http://127.0.0.1:" + PORT;
  * @param {*} data Form data
  * @returns Response from server
  */
-export const fetchSearchRequest = async(data) => {
-    const req = new Request(SERVER + "/search", {
+export const fetchSearchRequest = async(data, url = "/search") => {
+    const req = new Request(SERVER + url, {
         headers: {
             "Content-Type": "application/json", 
             "Accept": "application/json"
@@ -26,8 +26,8 @@ export const fetchSearchRequest = async(data) => {
  * @param {*} data Form data
  * @returns Response from server
  */
-export const fetchValuationRequest = async(data) => {
-    const req = new Request(SERVER + "/valuation", {
+export const fetchValuationRequest = async(data, url = "/valuation") => {
+    const req = new Request(SERVER + url, {
         headers: {
             "Content-Type": "application/json", 
             "Accept": "application/json"
@@ -42,8 +42,8 @@ export const fetchValuationRequest = async(data) => {
  * Creates an HTTP request to the server to retrieve the API Key
  * @returns Google Map API Key
  */
-export const fetchGMapsAPIKey = async() => {
-    const req = new Request(SERVER + "/mapskey", {
+export const fetchGMapsAPIKey = async(url = "/mapskey") => {
+    const req = new Request(SERVER + url, {
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json"
@@ -58,8 +58,8 @@ export const fetchGMapsAPIKey = async() => {
  * @param {*} data Form data
  * @returns Response from server
  */
-export const postContactUs = async(data) => {
-    const req = new Request(SERVER + "/feedback", {
+export const postContactUs = async(data, url = "/feedbacks") => {
+    const req = new Request(SERVER + url, {
         headers: {
             "Content-Type": "application/json",
             "Accept": "application/json"

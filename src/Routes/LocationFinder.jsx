@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import Filter from '../Components/Filter';
 
 import Map from '../Components/Map';
 import { Marker } from '../Components/Marker';
@@ -13,13 +14,19 @@ export default function LocationFinder() {
     const { state } = useLocation();
     const [pos, setPos] = useState();
     const [zoom, setZoom] = useState(15);
-    const blocks = useRef([]);
-    const facilityMarkers = useRef([]);
+    const blocks = useRef(state.blocks);
+    const facilityMarkers = useRef(state.facilityMarkers);
+    const factypes = useRef(state.factypes);
+    const [filterOutFac, setFilterOutFac] = useState([]);
 
-    useEffect(() => {
-        blocks.current = state.blocks;
-        facilityMarkers.current = state.facilityMarkers;
-    }, [state]);
+    const toggle = (toFilter) => {
+        let fac = [...filterOutFac]
+        if(filterOutFac.length === 0 || filterOutFac.find(item => item === toFilter) === undefined)
+            fac.push(toFilter);
+        else
+            fac.pop(fac.findIndex(item => item === toFilter));
+        setFilterOutFac(fac);
+    }
     
     /**
      * Handles on click of list item
@@ -53,7 +60,15 @@ export default function LocationFinder() {
                             </div>
                         </address>
                     </div>
-                    
+                    <div style={{display: "flex", flexDireciton: "row"}}>
+                        <span style={{fontWeight: 500, padding: 15}}>Filter: 
+                        { 
+                            factypes.current.map(item => {
+                                return <Filter key={item} displayName={item} onClickHandler={(e) => toggle(e)}/>
+                            })
+                        }
+                        </span>
+                    </div>
                         {
                             blocks.current.length > 0 ? <ScrollableList>
                                 {
@@ -89,10 +104,8 @@ export default function LocationFinder() {
                                 }) : null
                             }
                             {
-                                facilityMarkers.current.length > 0 ? facilityMarkers.current.map(item => {
-                                    return (
-                                        <Marker key={item.lat + item.lng} color={"#FF5cd9"} lat={item.lat} lng={item.lng}/>
-                                    )
+                                facilityMarkers.current.length > 0 ? facilityMarkers.current.filter(item => !filterOutFac.includes(item.type)).map(item => {
+                                    return <Marker key={item.lat + item.lng} color={"#FF5cd9"} lat={item.lat} lng={item.lng}/>
                                 }) : null
                             }
                         </Map>

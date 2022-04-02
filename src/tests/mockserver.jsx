@@ -17,5 +17,8 @@ export const server = setupServer(
     }),
     rest.post('http://127.0.0.1:43325/feedback', (req, res, ctx) => {
         return res(ctx.status(200));
+    }),
+    rest.post('http://127.0.0.1:43325/*', (req, res, ctx) => {
+        return rest(ctx.status(404));
     })
 )

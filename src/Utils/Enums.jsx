@@ -73,6 +73,60 @@ export const rangeMarks = {
 }
 
 /**
+ * Labels for the filter buttons
+ */
+export const labels = [
+    {
+        label: "Parks",
+        enc: "rc_parks"
+    },
+    {
+        label: "Bus Stops",
+        enc: "ts_bus_stops"
+    },
+    {
+        label: "Bus Interchanges",
+        enc: "ts_bus_interchange"
+    },
+    {
+        label: "MRT & LRT Stations",
+        enc: "ts_mrt_lrt"
+    },
+    {
+        label: "Clinics",
+        enc: "hc_clinic"
+    },
+    {
+        label: "Polyclinics",
+        enc: "hc_polyclinic"
+    },
+    {
+        label: "Hospital",
+        enc: "hc_hospital"
+    },
+    {
+        label: "Preschool & Childcare",
+        enc: "edu_preschool_childcare"
+    },
+    {
+        label: "Primary",
+        enc: "edu_primary"
+    },
+    {
+        label: "Secondary",
+        enc: "edu_secondary"
+    },
+    {
+        label: "Tertiary",
+        enc: "edu_tertiary"
+    },
+    {
+        label: "Universities",
+        enc: "edu_uni"
+    }
+]
+
+/**
  * Accordion info for locationfinder form
  */
 export const accordionInfo = [
@@ -289,7 +343,7 @@ export const search = {
 export const valuation = {
     valuation: {
         location: "",
-        room_type: "",
+        room_type: "1",
         area: 20
     }
 }

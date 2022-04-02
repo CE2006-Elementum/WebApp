@@ -8,7 +8,7 @@ import { postContactUs } from '../Utils/Fetch';
  * Contact Us Page
  * @returns A populated View
  */
-export default function ContactUs(){
+export default function ContactUs({testFetchURL}){
     const [contactForm, setContactForm] = useState({...contact});
     const [error, setError] = useState({error: ""});
     const [res, setRes] = useState({result: ""});
@@ -40,10 +40,18 @@ export default function ContactUs(){
             setError({error: "Please ensure that all fields are filled!"});
             return;
         }
-        postContactUs(contactForm.contact).then(response => {
+        postContactUs(contactForm.contact, testFetchURL).then(response => {
             if(response.status === 200)
+                return response.json();
+            else {
+                setError({error: "Error! " + response.status});
+                return null;
+            }
+        }).then(response => {
+            if(response !== null)
                 setRes({result: "Success!"});
-            else setError({error: "Error! " + response.status});
+        }).catch(error => {
+            setError({error: error});
         });
         setContactForm({...contactForm});
     }

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { Marker } from '../Components/Marker';
@@ -7,7 +7,6 @@ import ScrollableList from '../Components/ScrollableList';
 
 export default function Valuation() {
     const { state } = useLocation();
-    console.log(state);
     const [pos, setPos] = useState();
     const [zoom, setZoom] = useState(15);
     const property = useRef(state.property);

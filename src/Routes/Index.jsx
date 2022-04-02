@@ -1,17 +1,17 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { HashLink } from 'react-router-hash-link';
 import { useNavigate } from 'react-router-dom';
 
 import Accordion from '../Components/Accordion';
 import Carousel from '../Components/Carousel';
 import { DropDown, TextField, Button, RangeSlider, CheckBox } from '../Components/InputField';
-import { flatType, carouselLanding, carouselInfo, accordionInfo, rangeMarks, search, valuation, facilitiesTemp, blocksTemp, facilityMarkerTemp } from '../Utils/Enums';
+import { flatType, carouselLanding, carouselInfo, accordionInfo, rangeMarks, search, valuation } from '../Utils/Enums';
 import { fetchSearchRequest, fetchValuationRequest } from '../Utils/Fetch';
 
 /**
  * Landing screen / Home screen
  */
-export default function Index(){
+export default function Index({testFetchURL}){
     const navigate = useNavigate();
     const [searchForm, setSearchForm] = useState({...search});
     const [valuationForm, setValuationForm] = useState({...valuation});
@@ -20,6 +20,7 @@ export default function Index(){
     let blocks = [];
     let facilityMarkers = [];
     let property = [];
+    let factypes = [];
 
     /**
      * Custom Carousel Indicator for form selection
@@ -93,14 +94,25 @@ export default function Index(){
             setError({...error, search: "Please check if you've filled in all fields."});
             return;
         }
-        fetchSearchRequest(searchForm.search).then(response => {
-            if(response.status === 200)
+        const holder = {...searchForm.search};
+        setSearchForm({...searchForm});
+        fetchSearchRequest(holder, testFetchURL).then(response => {
+            if(response.status === 200) {
                 return response.json();
-            else setError({...error, search: "Error! " + response.status + " Please contact our support team!"});
+            }
+            else {
+                setError({...error, search: "Error! " + response.status + ". Error details: " + response.statusText + ". Please contact our support team!"});
+                return null;
+            }
         }).then(response => {
-            subscriberSearch(response);
-            navigate('/locationfinder', {state: {blocks, facilities, facilityMarkers}});
+            if(response !== null) {
+                subscriberSearch(response);
+                navigate('/locationfinder', {state: {blocks, facilities, facilityMarkers, factypes}});
+            }
+        }).catch(error => {
+            setError({...error, search: error});
         });
+        setSearchForm({...searchForm});
     }
 
     /**
@@ -113,16 +125,26 @@ export default function Index(){
             || valuationForm.valuation.location === "") {
                 setError({...error, valuation: "Please check if you've filled in all fields."});
                 return;
-            }
-        fetchValuationRequest(valuationForm.valuation).then(response => {           
+        }
+        const holder = {...valuationForm.valuation};
+        setValuationForm({...valuationForm});
+        fetchValuationRequest(valuationForm.valuation, testFetchURL).then(response => {
+            if(response.status === 200){
                 return response.json();
-        }).then(response => {
-            if(response.detail === undefined) {
-                subscriberValuation(response);
-                navigate('/valuation', {state: {property}});
             }
-            setError({...error, valuation: "Error: " + response.title + ". Error Details: " + response.detail});
+            else { 
+               setError({...error, valuation: "Error! " + response.status + ". Error details: " + response.statusText + ". Please contact our support team!"});
+               return null;
+            }
+        }).then(response => {
+                if(response !== null) {
+                    subscriberValuation(response);
+                    navigate('/valuation', {state: {property}});
+                }
+        }).catch(error => {
+            setError({...error, valuation: error});
         });
+        setValuationForm({...valuationForm});
     };
 
     const subscriberSearch = (response) => {
@@ -141,8 +163,11 @@ export default function Index(){
                 facilityMarkers = [];
                 blocks.forEach(item => {
                     item.facility_info.forEach(facility => {
-                        if(facilityMarkers.length === 0 || facilityMarkers.find(item => item.id === facility.id) === undefined)
-                            facilityMarkers.push({id: facility.id, lat: facility.info.position.lat, lng: facility.info.position.lon});
+                        if(facilityMarkers.length === 0 || facilityMarkers.find(item => item.id === facility.id) === undefined) {
+                            facilityMarkers.push({id: facility.id, lat: facility.info.position.lat, lng: facility.info.position.lon, type: facility.info.factype});
+                            if(factypes.length === 0 || factypes.find(item => item === facility.info.factype) === undefined)
+                                factypes.push(facility.info.factype);
+                        }
                     })
                 });
             }

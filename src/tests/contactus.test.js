@@ -23,17 +23,8 @@ afterAll(() => server.close());
 jest.setTimeout(15000);
 
 describe("Contact Us test suite", () => {
-    it('Contact Us - Should not able to post to server', async() => {
-        render(<App history={history}/>);
-        fireEvent.click(screen.getAllByText("Contact Us")[0]);
-        const button = screen.getAllByText("SEND")[0];
-
-        fireEvent.click(button);
-
-        expect(await screen.findByLabelText(/contactError/i)).toHaveTextContent("Please ensure that all fields are filled!");
-    });
-
-    it("Contact Us - Should be able to post to server", async() => {
+    
+    it("Contact Us - Should receive a response from the server with results", async() => {
         render(<App history={history}/>);
         fireEvent.click(screen.getAllByText("Contact Us")[0]); //Ensure that we're on contact us page
 
@@ -81,5 +72,44 @@ describe("Contact Us test suite", () => {
             })
         }, 1000);
         //END ASSERTION CHECKS
-    })
+    });
+    
+    it('Contact Us - Should not able to post to server as validation failed', async() => {
+        render(<App history={history}/>);
+        fireEvent.click(screen.getAllByText("Contact Us")[0]);
+        const button = screen.getAllByText("SEND")[0];
+        const lastName = screen.getAllByLabelText(/last_name/i)[0];
+        const mobile = screen.getAllByLabelText(/mobile/i)[0];
+        const email = screen.getAllByLabelText(/email/i)[0];
+        const role = screen.getAllByLabelText(/Buyer/i)[0];
+        const msg = screen.getAllByLabelText(/message/i)[0];
+
+        //START SIMULATING USER EVENT
+        fireEvent.change(lastName, {
+            target: {value: "Loh"}
+        });
+        fireEvent.change(mobile, {
+            target: {value: "12345678"}
+        });
+        fireEvent.change(email, {
+            target: {value: "zloh013@e.ntu.edu.sg"}
+        });
+        fireEvent.click(role);
+        fireEvent.change(msg, {
+            target: {value: "Test Message"}
+        });
+        expect(lastName).toHaveDisplayValue("Loh");
+        expect(mobile).toHaveDisplayValue("12345678");
+        expect(email).toHaveDisplayValue("zloh013@e.ntu.edu.sg");
+        expect(role).toBeChecked();
+        expect(msg).toHaveDisplayValue("Test Message");
+        fireEvent.click(button);
+        //END SIMULATING USER EVENT
+        
+        setTimeout(async() => {
+            await act(async() => {
+                expect(await screen.findByLabelText(/contactError/i)).toHaveTextContent("Please ensure that all fields are filled!");
+            });
+        }, 1000);
+    });
 })
