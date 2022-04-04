@@ -5,11 +5,14 @@ import { labels } from '../Utils/Enums.jsx';
 
 /**
  * Returns a button that enables a filter function
- * @param {String} displayName The encoded verison of the actual name to display
- * @param {Fucntion} onClickHandler The function to handle the onclick event
- * @returns A JSX.Element
+ * @component
+ * @author Zhi Heng
+ * @param {Object} props Component props
+ * @param {string} props.displayName The encoded verison of the actual name to display
+ * @param {function} props.onClickHandler The function to handle the onclick event
+ * @returns {JSX.Element} A JSX.Element
  */
-export default function Filter({displayName, onClickHandler}) {
+function Filter({displayName, onClickHandler}) {
     const [active, setActive] = useState(false);
 
     /**
@@ -65,3 +68,5 @@ export default function Filter({displayName, onClickHandler}) {
         </div>
     )
 }
+
+export default Filter;

@@ -2,9 +2,16 @@ import React, { useState } from 'react';
 
 /**
  * Custom Accordion
- * @returns An JSX.Element
+ * @component
+ * @author Zhi Heng
+ * @param {Object} props Component props
+ * @param {string} props.data Header for the accordion
+ * @param {object} props.styles Styling of the accordion
+ * @param {JSX.Element} props.children Elements to be display when accordion is open
+ * @returns {JSX.Element} An JSX.Element
  */
-export default function Accordion({data, styles, children}) {
+
+function Accordion({data, styles, children}) {
     const [isActive, setIsActive] = useState(false);
     
     return (
@@ -17,3 +24,5 @@ export default function Accordion({data, styles, children}) {
         </div>
     );
 }
+
+export default Accordion;

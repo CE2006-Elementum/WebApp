@@ -11,7 +11,7 @@ import ContactUs from "../Routes/ContactUs";
 /**
  * Used to setup the router
  */
-const links = [
+export const links = [
   {
     to: "/",
     element: <Index/>,
@@ -49,4 +49,3 @@ export const mainNav = [
     <Link key={"faq"} to="/faq" name="FAQ" style={{textDecoration: "none", fontSize: "18px", color: "var(--font-color-active)", margin: "15px 20px", fontWeight: 500}}>FAQ</Link>,
     <Link key={"contact"} to="/contactus" name="Contact Us" style={{textDecoration: "none", fontSize: "18px", color: "var(--font-color-active)", margin: "15px 20px", fontWeight: 500}}>Contact Us</Link>
 ]
-export default links;

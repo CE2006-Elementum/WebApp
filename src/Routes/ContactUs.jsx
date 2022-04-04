@@ -6,16 +6,19 @@ import { postContactUs } from '../Utils/Fetch';
 
 /**
  * Contact Us Page
+ * @component
+ * @author Zhi Heng
  * @returns A populated View
  */
-export default function ContactUs({testFetchURL}){
+export default function ContactUs(){
     const [contactForm, setContactForm] = useState({...contact});
     const [error, setError] = useState({error: ""});
     const [res, setRes] = useState({result: ""});
 
     /**
      * Contact Us Form handler to prepare the request that is to be sent on click
-     * @param {*} e Value for which to be updated
+     * @author Zhi Heng
+     * @param {object} e Value for which to be updated
      * @param {string} key Key for which the value is to be updated
      */
     const updateContactForm = (e, key) => {
@@ -28,6 +31,7 @@ export default function ContactUs({testFetchURL}){
 
     /**
      * Validates the form data and tries to submit the form to the server
+     * @author Zhi Heng
      */
     const submitContactForm = () => {
         setError({error: ""});
@@ -40,18 +44,10 @@ export default function ContactUs({testFetchURL}){
             setError({error: "Please ensure that all fields are filled!"});
             return;
         }
-        postContactUs(contactForm.contact, testFetchURL).then(response => {
+        postContactUs(contactForm.contact).then(response => {
             if(response.status === 200)
-                return response.json();
-            else {
-                setError({error: "Error! " + response.status});
-                return null;
-            }
-        }).then(response => {
-            if(response !== null)
                 setRes({result: "Success!"});
-        }).catch(error => {
-            setError({error: error});
+            else setError({error: "Error! " + response.status});
         });
         setContactForm({...contactForm});
     }
@@ -172,9 +168,9 @@ export default function ContactUs({testFetchURL}){
                     <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
                         <h3 className="info">Singapore Head Office</h3>
                         <address>Nanyang Technological University</address>
-                        <address>50 Nanyang Avennue, 32 Block,</address>
+                        <address>50 Nanyang Avenue, 32 Block,</address>
                         <address>N4-B1C-14</address>
-                        <address>Sinagpore 639798</address>
+                        <address>Singapore 639798</address>
                         <address>Tuesday - 10:30AM to 12:20PM</address>
                     </div>
                 </div>

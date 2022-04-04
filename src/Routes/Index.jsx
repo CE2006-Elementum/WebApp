@@ -10,8 +10,11 @@ import { fetchSearchRequest, fetchValuationRequest } from '../Utils/Fetch';
 
 /**
  * Landing screen / Home screen
+ * @component
+ * @author Zhi Heng
+ * @return A populated view
  */
-export default function Index({testFetchURL}){
+export default function Index(){
     const navigate = useNavigate();
     const [searchForm, setSearchForm] = useState({...search});
     const [valuationForm, setValuationForm] = useState({...valuation});
@@ -24,10 +27,12 @@ export default function Index({testFetchURL}){
 
     /**
      * Custom Carousel Indicator for form selection
-     * @param {*} clickHandler Predefined, do not change
-     * @param {*} isSelected Predefined, do not change
-     * @param {*} index Predefined, do not change
-     * @param {*} label Predefined, do not change
+     * @component
+     * @author Zhi Heng
+     * @param {fuction} clickHandler Predefined, do not change
+     * @param {boolean} isSelected Predefined, do not change
+     * @param {number} index Predefined, do not change
+     * @param {string} label Predefined, do not change
      * @returns An JSX Element
      */
     const customIndicator = (clickHandler, isSelected, index, label) => {
@@ -44,7 +49,8 @@ export default function Index({testFetchURL}){
 
     /**
      * Location Finder Form Handler to prepare the request that is to be sent on click
-     * @param {*} e Value for which to be updated
+     * @author Zhi Heng
+     * @param {object} e Value for which to be updated
      * @param {string} key Key for which the value is to be updated
      */
     const updateLocationFinderForm = (e, key) => {
@@ -58,6 +64,7 @@ export default function Index({testFetchURL}){
             if(typeof(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]]) === "object") { //Checks if the typeof the key-value pair is an object
                 if(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].indexOf(e) === -1)
                     shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].push(e);
+                else shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].pop(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].indexOf(e));
             }
             else shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]] = e;
         } else if(keySplit.length === 3) {
@@ -72,6 +79,7 @@ export default function Index({testFetchURL}){
 
     /**
      * Valuation Form Handler to prepare the request that is to be sent on click
+     * @author Zhi Heng
      * @param {*} e Value for which to be updated
      * @param {string} key Key for which the value is to be updated
      */
@@ -85,6 +93,7 @@ export default function Index({testFetchURL}){
 
     /**
      * Performs a validation on searchForm to ensure that all fields are filled. Then, proceeds to fetch data from the server.
+     * @author Zhi Heng
      * @returns Nothing, only to cause navigation on success, else it'll display an error message.
      */
     const submitSearch = async() => {
@@ -96,7 +105,7 @@ export default function Index({testFetchURL}){
         }
         const holder = {...searchForm.search};
         setSearchForm({...searchForm});
-        fetchSearchRequest(holder, testFetchURL).then(response => {
+        fetchSearchRequest(holder).then(response => {
             if(response.status === 200) {
                 return response.json();
             }
@@ -117,6 +126,7 @@ export default function Index({testFetchURL}){
 
     /**
      * Performs a validation on searchForm to ensure that all fields are filled. Then, proceeds to fetch data from the server.
+     * @author Zhi Heng
      * @returns Nothing, only to cause navigation on success, else it'll display an error message.
      */
     const submitValuation = async() => {
@@ -128,7 +138,7 @@ export default function Index({testFetchURL}){
         }
         const holder = {...valuationForm.valuation};
         setValuationForm({...valuationForm});
-        fetchValuationRequest(valuationForm.valuation, testFetchURL).then(response => {
+        fetchValuationRequest(valuationForm.valuation).then(response => {
             if(response.status === 200){
                 return response.json();
             }
@@ -147,6 +157,11 @@ export default function Index({testFetchURL}){
         setValuationForm({...valuationForm});
     };
 
+    /**
+     * Performs transformation of response from the server
+     * @author Zhi Heng
+     * @param {object} response Data received from server
+     */
     const subscriberSearch = (response) => {
         blocks = [];
         if(response.blocks.length > 0) {
@@ -174,6 +189,11 @@ export default function Index({testFetchURL}){
         }
     };
 
+    /**
+     * Performs transformation of response from the server
+     * @author Zhi Heng
+     * @param {object} response Data received from server
+     */
     const subscriberValuation = (response) => {
         if(response.nearby_valuations.length > 0) {
             property = response;

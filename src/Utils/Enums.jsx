@@ -1,17 +1,5 @@
 import React from 'react';
 
-
-const position = {
-    lat: 0.0,
-    lon: 0.0
-}
-
-const block_info = {
-    name: "",
-    position: position,
-    postal_code: 0
-}
-
 /**
  * Enum for dropdown list for room type
  */
@@ -343,7 +331,7 @@ export const search = {
 export const valuation = {
     valuation: {
         location: "",
-        room_type: "1",
+        room_type: "",
         area: 20
     }
 }
@@ -360,35 +348,4 @@ export const contact = {
         message: "",
         email: ""
     }
-}
-
-export const facilitiesTemp = {
-    id: 0,
-    info: {
-        factype: "",
-        name: "",
-        position: position
-    }
-}
-
-export const blocksTemp = {
-    block_info: {
-        basic: block_info,
-        distance: 0.0,
-        facilities: [],
-        flat: [],
-    },
-    facility_info: [facilitiesTemp]
-}
-
-export const facilityMarkerTemp = {
-    id: 0,
-    lat: position.lat,
-    lng: position.lon
-}
-
-export const valuationTemp = {
-    nearby_valuations: [block_info],
-    position: position,
-    valuation: 0
 }

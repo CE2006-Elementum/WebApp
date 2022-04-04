@@ -5,16 +5,27 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
 /**
  * Custom JS carousel
- * @returns An JSX.Element
+ * @component
+ * @author Zhi Heng
+ * @param {Object} props Component props
+ * @param {Object} props.imageList Images to be displayed
+ * @param {number} props.imgHeight Fixed height to render
+ * @param {JSX.Element} props.children Child Elements to display
+ * @param {boolean} props.showArrows To display arrows or not
+ * @param {JSX.Element} props.renderIndicator Custom Indicator
+ * @param {boolean} props.dynamicHeight Dynamically adjust height
+ * @returns {JSX.Element} An JSX.Element
  */
-export default function Carousel({imageList, imgHeight, children, showArrows, renderIndicator, dynamicHeight}) {
+function Carousel({imageList, imgHeight, children, showArrows, renderIndicator, dynamicHeight}) {
 
     /**
      * Custom arrow element
-     * @param {*} clickHandler Predefined
-     * @param {*} hasNext Predefined
-     * @param {*} label Predefined
-     * @returns An JSX.Element
+     * @component
+     * @author Zhi Heng
+     * @param {function} clickHandler Predefined
+     * @param {function} hasNext Predefined
+     * @param {string} label Predefined
+     * @returns {JSX.Element} An JSX.Element
      */
     const customRenderNextArrow = (clickHandler, hasNext, label) => {
         return showArrows ? <div onClick={clickHandler} title={label} style={{position: 'absolute', zIndex: 2, top: 'calc(50% - 15px)', width: 30, height: 30, right: 15}}>
@@ -24,10 +35,12 @@ export default function Carousel({imageList, imgHeight, children, showArrows, re
 
     /**
      * Custom arrow element
-     * @param {*} clickHandler Predefined
-     * @param {*} hasNext Predefined
-     * @param {*} label Predefined
-     * @returns An JSX.Element
+     * @component
+     * @author Zhi Heng
+     * @param {function} clickHandler Predefined
+     * @param {function} hasNext Predefined
+     * @param {string} label Predefined
+     * @returns {JSX.Element} An JSX.Element
      */
     const customRenderPrevArrow = (clickHandler, hasNext, label) => {
         return showArrows ? <div onClick={clickHandler} title={label} style={{position: 'absolute', zIndex: 2, top: 'calc(50%)', width: 30, height: 30, left: 15}}>
@@ -60,3 +73,5 @@ export default function Carousel({imageList, imgHeight, children, showArrows, re
         </div>
     );
 }
+
+export default Carousel;

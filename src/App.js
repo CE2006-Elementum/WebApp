@@ -4,8 +4,16 @@ import { Outlet, Route, BrowserRouter as Router, Routes, } from 'react-router-do
 
 import MainNav from './Components/MainNav';
 import Footer from './Components/Footer';
-import links, { mainNav } from "./Utils/Routes";
+import { links, mainNav } from "./Utils/Routes";
 
+/**
+ * This is where each page will be rendered in
+ * @component
+ * @author Zhi Heng
+ * @param {object} props Component props 
+ * @param {JSX.Element} props.children Child elements that will be rendered
+ * @returns {JSX.Element} An JSX element
+ */
 export function Layout({children}) {
   return (
     <div className="app">
@@ -20,7 +28,15 @@ export function Layout({children}) {
   )
 }
 
-function App({history, testURL}) {
+/**
+ * This is contains the router for routing and the layout for rendering
+ * @component
+ * @author Zhi Heng
+ * @param {object} props Component props
+ * @param {RouterProps} props.history Used in testing
+ * @returns {JSX.Element} An JSX element
+ */
+function App({history}) {
   return (
     <Router history={history}>
       <Layout>
@@ -28,7 +44,7 @@ function App({history, testURL}) {
         <Routes>
           {
             links.map((route, index) => {
-              return <Route path={route.to} element={ process.env.NODE_ENV === "test" ? React.cloneElement(route.element, {testFetchURL: testURL}) : route.element } key={index}/>
+              return <Route path={route.to} element={route.element} key={index}/>
             })
           }
         </Routes>

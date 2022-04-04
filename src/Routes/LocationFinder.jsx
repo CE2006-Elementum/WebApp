@@ -8,6 +8,8 @@ import ScrollableList from '../Components/ScrollableList';
 
 /**
  * Search result page for Location Finder Form
+ * @component
+ * @author Zhi Heng
  * @returns A populated view
  */
 export default function LocationFinder() {
@@ -19,6 +21,11 @@ export default function LocationFinder() {
     const factypes = useRef(state.factypes);
     const [filterOutFac, setFilterOutFac] = useState([]);
 
+    /**
+     * Toggles the filter of facilities
+     * @author Zhi Heng
+     * @param {string} toFilter Facility to filter out
+     */
     const toggle = (toFilter) => {
         let fac = [...filterOutFac]
         if(filterOutFac.length === 0 || filterOutFac.find(item => item === toFilter) === undefined)
@@ -30,9 +37,10 @@ export default function LocationFinder() {
     
     /**
      * Handles on click of list item
-     * @param {*} newLat Latitude of the block
-     * @param {*} newLng Longitude of the block
-     * @param {*} e Just to prevent random default behaviors
+     * @author Zhi Heng
+     * @param {Geography} newLat Latitude of the block
+     * @param {Geography} newLng Longitude of the block
+     * @param {object} e Just to prevent random default behaviors
      */
     const listItemClickHandler = (newLat, newLng, e) => {
         e.preventDefault();

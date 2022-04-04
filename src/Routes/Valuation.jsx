@@ -5,6 +5,12 @@ import { Marker } from '../Components/Marker';
 import Map from '../Components/Map';
 import ScrollableList from '../Components/ScrollableList';
 
+/**
+ * Valuation result page for Valuation Form
+ * @component
+ * @author Zhi Heng
+ * @returns A populated view
+ */
 export default function Valuation() {
     const { state } = useLocation();
     const [pos, setPos] = useState();
@@ -13,9 +19,10 @@ export default function Valuation() {
 
     /**
      * Handles on click of list item
-     * @param {*} newLat Latitude of the block
-     * @param {*} newLng Longitude of the block
-     * @param {*} e Just to prevent random default behaviors
+     * @author Zhi Heng
+     * @param {Geography} newLat Latitude of the block
+     * @param {Geography} newLng Longitude of the block
+     * @param {object} e Just to prevent random default behaviors
      */
     const listItemClickHandler = (newLat, newLng, e) => {
         e.preventDefault();

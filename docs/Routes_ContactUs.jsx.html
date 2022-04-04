@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Routes/ContactUs.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Routes/ContactUs.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from 'react';
+
+import { Button, RadioButton, TextArea, TextField } from "../Components/InputField";
+import { contact } from '../Utils/Enums';
+import { postContactUs } from '../Utils/Fetch';
+
+/**
+ * Contact Us Page
+ * @component
+ * @author Zhi Heng
+ * @returns A populated View
+ */
+export default function ContactUs(){
+    const [contactForm, setContactForm] = useState({...contact});
+    const [error, setError] = useState({error: ""});
+    const [res, setRes] = useState({result: ""});
+
+    /**
+     * Contact Us Form handler to prepare the request that is to be sent on click
+     * @author Zhi Heng
+     * @param {object} e Value for which to be updated
+     * @param {string} key Key for which the value is to be updated
+     */
+    const updateContactForm = (e, key) => {
+        const shallowCopy = {...contactForm}; //Shallow copying
+        const keys = Object.keys(shallowCopy.contact); //Get all keys
+        const index = keys.indexOf(key); //Get index of matching key
+        shallowCopy.contact[keys[index]] = e;
+        setContactForm(shallowCopy);
+    }
+
+    /**
+     * Validates the form data and tries to submit the form to the server
+     * @author Zhi Heng
+     */
+    const submitContactForm = () => {
+        setError({error: ""});
+        if(contactForm.contact.first_name === "" || contactForm.contact.first_name === null
+            || contactForm.contact.last_name === "" || contactForm.contact.last_name === null
+            || contactForm.contact.message === "" || contactForm.contact.message === null
+            || contactForm.contact.email === "" || contactForm.contact.email === null
+            || contactForm.contact.role === "" || contactForm.contact.role === null
+            || contactForm.contact.phone === "" || contactForm.contact.phone === null) {
+            setError({error: "Please ensure that all fields are filled!"});
+            return;
+        }
+        postContactUs(contactForm.contact).then(response => {
+            if(response.status === 200)
+                setRes({result: "Success!"});
+            else setError({error: "Error! " + response.status});
+        });
+        setContactForm({...contactForm});
+    }
+    
+    return (
+        &lt;div className="contact-container" style={{display: "flex", flexDirection: "column", backgroundImage: "linear-gradient(to bottom, #F8F1E4, #FFFFFF)"}}>
+            &lt;div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginTop: 50, padding: 20, flexWrap: "wrap"}}>
+                &lt;div style={{display: "flex", flexDirection: "column", margin: "auto", flexWrap: "wrap"}}>
+                    &lt;h3 className="title">Contact Us&lt;/h3>
+                    &lt;span aria-label="contactError">{error.error ? error.error : res.result ? res.result : ""}&lt;/span>
+                    &lt;form>
+                        &lt;div style={{display: "flex", flexDirection: "row", justifyContent: "center", marginBottom: 20}}>
+                            &lt;div style={{display: "flex", flexDirection: "column", marginRight: 20}}>                                
+                                &lt;TextField
+                                    name={"first_name"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "first_name")}
+                                />
+                                &lt;label className="input-label-sub" htmlFor="first_name" style={{fontSize: "12px"}}>First Name&lt;/label>
+                            &lt;/div>
+                            &lt;div style={{display: "flex", flexDirection: "column",}}>
+                                &lt;TextField
+                                    name={"last_name"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "last_name")}
+                                />
+                                &lt;label className="input-label-sub" htmlFor="last_name" style={{fontSize: "12px"}}>Last Name&lt;/label>
+                            &lt;/div>
+                        &lt;/div>
+                        &lt;div style={{display: "flex", marginBottom: 30}}>
+                            &lt;div stlye={{display: "flex", flexDirection: "column"}}>
+                                &lt;label className="input-label" htmlFor="mobileNo">Mobile Number *&lt;/label>
+                                &lt;TextField
+                                    name={"mobileNo"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "phone")}
+                                />
+                            &lt;/div>
+                        &lt;/div>
+                        &lt;div style={{display: "flex", marginBottom: 30}}>
+                            &lt;div stlye={{display: "flex", flexDirection: "column"}}>
+                                &lt;label className="input-label" htmlFor="email">Email *&lt;/label>
+                                &lt;TextField
+                                    name={"email"}
+                                    styles={{width: "300px"}}
+                                    onChange={(e) => updateContactForm(e, "email")}
+                                />
+                            &lt;/div>
+                        &lt;/div>
+                        &lt;div style={{display: "flex", flexDirection: "column", marginBottom: 20}}>
+                            &lt;label className="input-label" htmlFor="asRole">Enquiring as *&lt;/label>
+                            &lt;RadioButton
+                                label={"Buyer"}
+                                name={"asRole"}
+                                value={"buyer"}
+                                onChange={(e) => updateContactForm(e, "role")}
+                            />
+                            &lt;RadioButton
+                                label={"Seller"}
+                                name={"asRole"}
+                                value={"seller"}
+                                onChange={(e) => updateContactForm(e, "role")}
+                            />
+                            &lt;RadioButton
+                                label={"Agent"}
+                                name={"asRole"}
+                                value={"agent"}
+                                onChange={(e) => updateContactForm(e, "role")}
+                            />
+                        &lt;/div>
+                        &lt;div style={{display: "flex", flexDirection: "column", marginBottom: 30}}>
+                            &lt;label className="input-label" htmlFor="msg">Message *&lt;/label>
+                            &lt;TextArea
+                                ariaLabel={"message"}
+                                rows="10"
+                                cols="85"
+                                onChange={(e) => updateContactForm(e, "message")}
+                            />
+                        &lt;/div>
+                        &lt;div style={{display: "flex", marginBottom: 30}}>
+                            &lt;Button
+                                aria-label="contactButton"
+                                innerHTML={"SEND"}
+                                buttonStyles={
+                                    {
+                                        height: 36,
+                                        padding: 20,
+                                        fontSize: 16,
+                                        backgroundColor: "#D48472",
+                                        border: "none",
+                                        borderRadius: 10,
+                                        color: "var(--font-color-light)",
+                                        fontWeight: 500,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        zIndex: 1000
+                                    }
+                                }
+                                onClickHandler={(e) => {
+                                    //TODO: Send form request to server
+                                    e.preventDefault();
+                                    submitContactForm();
+                                }}
+                            />
+                        &lt;/div>
+                    &lt;/form>
+                    &lt;div style={{display: "flex", flexDirection: "column", marginBottom: 20}}>
+                        &lt;h4 className="info">Customer support&lt;/h4>
+                        &lt;address>cs@elementum.sg&lt;/address>
+                        &lt;h4 className="info">Corporate&lt;/h4>
+                        &lt;address>chua0994@e.ntu.edu.sg&lt;/address>
+                    &lt;/div>
+                &lt;/div>
+                &lt;div style={{display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", margin: "auto"}}>
+                    &lt;div>
+                        &lt;img className="logo" src={require("../assets/06bacb2d15838ff39a30359cac950d36.png")} alt="Logo" style={{width: "150px", height: "150px"}}/>
+                    &lt;/div>
+                    &lt;div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                        &lt;h3 className="info">Singapore Head Office&lt;/h3>
+                        &lt;address>Nanyang Technological University&lt;/address>
+                        &lt;address>50 Nanyang Avenue, 32 Block,&lt;/address>
+                        &lt;address>N4-B1C-14&lt;/address>
+                        &lt;address>Singapore 639798&lt;/address>
+                        &lt;address>Tuesday - 10:30AM to 12:20PM&lt;/address>
+                    &lt;/div>
+                &lt;/div>
+            &lt;/div>
+        &lt;/div>
+    )
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Accordion">Accordion</a></li><li><a href="global.html#accordionInfo">accordionInfo</a></li><li><a href="global.html#App">App</a></li><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Carousel">Carousel</a></li><li><a href="global.html#carouselInfo">carouselInfo</a></li><li><a href="global.html#carouselLanding">carouselLanding</a></li><li><a href="global.html#CheckBox">CheckBox</a></li><li><a href="global.html#contact">contact</a></li><li><a href="global.html#DropDown">DropDown</a></li><li><a href="global.html#faqAns">faqAns</a></li><li><a href="global.html#fetchGMapsAPIKey">fetchGMapsAPIKey</a></li><li><a href="global.html#fetchSearchRequest">fetchSearchRequest</a></li><li><a href="global.html#fetchValuationRequest">fetchValuationRequest</a></li><li><a href="global.html#Filter">Filter</a></li><li><a href="global.html#flatType">flatType</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#GMap">GMap</a></li><li><a href="global.html#labels">labels</a></li><li><a href="global.html#Layout">Layout</a></li><li><a href="global.html#links">links</a></li><li><a href="global.html#MainNav">MainNav</a></li><li><a href="global.html#mainNav">mainNav</a></li><li><a href="global.html#Marker">Marker</a></li><li><a href="global.html#postContactUs">postContactUs</a></li><li><a href="global.html#RadioButton">RadioButton</a></li><li><a href="global.html#rangeMarks">rangeMarks</a></li><li><a href="global.html#RangeSlider">RangeSlider</a></li><li><a href="global.html#ScrollableList">ScrollableList</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchRes">searchRes</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#valRes">valRes</a></li><li><a href="global.html#valuation">valuation</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Apr 04 2022 23:08:22 GMT+0800 (Singapore Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -4,6 +4,8 @@ import { faqAns } from '../Utils/Enums';
 
 /**
  * FAQ Page
+ * @component
+ * @author Zhi Heng
  * @returns A populated View 
  */
 export default function FAQ(){

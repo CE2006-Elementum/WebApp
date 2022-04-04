@@ -5,7 +5,9 @@ const SERVER = "http://127.0.0.1:" + PORT;
 
 /**
  * Creates an HTTP request to the server with the form data
- * @param {*} data Form data
+ * @author Zhi Heng
+ * @param {object} data Form data
+ * @param {string} [url=search] Endpoint to hit
  * @returns Response from server
  */
 export const fetchSearchRequest = async(data, url = "/search") => {
@@ -23,7 +25,9 @@ export const fetchSearchRequest = async(data, url = "/search") => {
 
 /**
  * Creates an HTTP request to the server with the form data
- * @param {*} data Form data
+ * @author Zhi Heng
+ * @param {object} data Form data
+ * @param {string} [url=valuation] Endpoint to hit
  * @returns Response from server
  */
 export const fetchValuationRequest = async(data, url = "/valuation") => {
@@ -40,6 +44,8 @@ export const fetchValuationRequest = async(data, url = "/valuation") => {
 
 /**
  * Creates an HTTP request to the server to retrieve the API Key
+ * @author Zhi Heng
+ * @param {string} [url=mapskey] Endpoint to hit
  * @returns Google Map API Key
  */
 export const fetchGMapsAPIKey = async(url = "/mapskey") => {
@@ -55,7 +61,9 @@ export const fetchGMapsAPIKey = async(url = "/mapskey") => {
 
 /**
  * Creates an HTTP request to the server to submit a contact us request
- * @param {*} data Form data
+ * @author Zhi Heng
+ * @param {object} data Form data
+ * @param {string} [url=feedbacks] Endpoint to hit
  * @returns Response from server
  */
 export const postContactUs = async(data, url = "/feedbacks") => {

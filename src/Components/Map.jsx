@@ -4,14 +4,17 @@ import { fetchGMapsAPIKey } from '../Utils/Fetch';
 
 /**
  * Google Map Component
- * @param {Geography} defaultCenter Location that is focused on load
- * @param {Integer} defaultZoom Default Zoom level on load
- * @param {Geography} center Location to be focused
- * @param {Interger} zoom Zoom level
- * @param {JSX.Element} children Any HTML/JSX based element to be enumerated
- * @returns An JSX.Element
+ * @component
+ * @author Zhi Heng
+ * @param {object} props Component props
+ * @param {Geography} props.defaultCenter Location that is focused on load
+ * @param {number} props.defaultZoom Default Zoom level on load
+ * @param {Geography} props.center Location to be focused
+ * @param {number} props.zoom Zoom level
+ * @param {JSX.Element} props.children Any HTML/JSX based element to be enumerated
+ * @returns {JSX.Element} An JSX.Element
  */
-export default function GMap({defaultCenter, defaultZoom, center, zoom, children}) {
+function GMap({defaultCenter, defaultZoom, center, zoom, children}) {
     const [apiKey, setAPIKey] = useState();
 
     /**
@@ -48,3 +51,5 @@ export default function GMap({defaultCenter, defaultZoom, center, zoom, children
         <div style={{display: "flex", height: "100%"}}>{map}</div>
     )
 }
+
+export default GMap;

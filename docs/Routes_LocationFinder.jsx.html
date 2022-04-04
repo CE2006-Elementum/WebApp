@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Routes/LocationFinder.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Routes/LocationFinder.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import Filter from '../Components/Filter';
+
+import Map from '../Components/Map';
+import { Marker } from '../Components/Marker';
+import ScrollableList from '../Components/ScrollableList';
+
+/**
+ * Search result page for Location Finder Form
+ * @component
+ * @author Zhi Heng
+ * @returns A populated view
+ */
+export default function LocationFinder() {
+    const { state } = useLocation();
+    const [pos, setPos] = useState();
+    const [zoom, setZoom] = useState(15);
+    const blocks = useRef(state.blocks);
+    const facilityMarkers = useRef(state.facilityMarkers);
+    const factypes = useRef(state.factypes);
+    const [filterOutFac, setFilterOutFac] = useState([]);
+
+    /**
+     * Toggles the filter of facilities
+     * @author Zhi Heng
+     * @param {string} toFilter Facility to filter out
+     */
+    const toggle = (toFilter) => {
+        let fac = [...filterOutFac]
+        if(filterOutFac.length === 0 || filterOutFac.find(item => item === toFilter) === undefined)
+            fac.push(toFilter);
+        else
+            fac.pop(fac.findIndex(item => item === toFilter));
+        setFilterOutFac(fac);
+    }
+    
+    /**
+     * Handles on click of list item
+     * @author Zhi Heng
+     * @param {Geography} newLat Latitude of the block
+     * @param {Geography} newLng Longitude of the block
+     * @param {object} e Just to prevent random default behaviors
+     */
+    const listItemClickHandler = (newLat, newLng, e) => {
+        e.preventDefault();
+        setPos({lat: newLat, lng: newLng});
+        setZoom(20);
+    }
+
+    return (
+        &lt;div aria-label="search-result-container" className="result-container" style={{display: "flex", flexDirection: "column", backgroundImage: "linear-gradient(to bottom, #F8F1E4, #FFFFFF)"}}>
+            &lt;div className="results" style={{display: "flex", flexDirection: "row", justifyContent: "center", width: "100%", marginTop: 100}}>
+                &lt;div className="results-list" style={{display: "flex", flexDirection: "column", flex: 1.5, padding: 20}}>
+                    &lt;div style={{display: "flex", padding: 20}}>
+                        &lt;span style={{fontSize: "48px"}}>{ blocks.current.length > 0 ? "Here are the locations that we have found!" : "Sorry our search algorithm returned no results! Try refining your search criteria!"}&lt;/span>
+                    &lt;/div>
+                    &lt;div style={{display: "flex", flexDirection: "column"}}>
+                        &lt;address style={{padding: 15, fontWeight: 500}}>
+                            Legend
+                            &lt;div style={{display: "flex", flexDirection: "row", padding: 5}}>
+                                &lt;div style={{width: 20, height: 20, backgroundColor: "#af5cd9", borderRadius: 10}}/>
+                                &lt;span style={{marginLeft: 5}}> - Blocks within search radius&lt;/span>
+                            &lt;/div>
+                            &lt;div style={{display: "flex", flexDirection: "row", padding: 5}}>
+                                &lt;div style={{width: 20, height: 20, backgroundColor: "#FF5cd9", borderRadius: 10}}/>
+                                &lt;span style={{marginLeft: 5}}> - Facilities within search radius&lt;/span>
+                            &lt;/div>
+                        &lt;/address>
+                    &lt;/div>
+                    &lt;div style={{display: "flex", flexDireciton: "row"}}>
+                        &lt;span style={{fontWeight: 500, padding: 15}}>Filter: 
+                        { 
+                            factypes.current.map(item => {
+                                return &lt;Filter key={item} displayName={item} onClickHandler={(e) => toggle(e)}/>
+                            })
+                        }
+                        &lt;/span>
+                    &lt;/div>
+                        {
+                            blocks.current.length > 0 ? &lt;ScrollableList>
+                                {
+                                    blocks.current.map((item, index) => {
+                                        return (
+                                            &lt;div key={item.block_info.basic.name} style={{border: "1px solid black", borderRadius: 5, backgroundImage: "linear-gradient(to right, #FBDDAD, #FFFFFF)",}} onClick={(e) => listItemClickHandler(item.block_info.basic.position.lat, item.block_info.basic.position.lon, e)}>
+                                                &lt;div style={{marginLeft: 10, padding: 5, display: "flex", flexDirection:"column"}}>
+                                                    &lt;span style={{fontSize: 28, fontWeight: 600, marginBottom: 10}}>{item.block_info.basic.name}&lt;/span>
+                                                    &lt;span style={{fontSize: 24, fontWeight: 600}}>Facilities&lt;/span>
+                                                    &lt;ul>
+                                                        {
+                                                            item.facility_info.length > 0 ? item.facility_info.map((facility, index) => {
+                                                                return &lt;li key={facility.info.name + item.block_info.basic.name}>{facility.info.name}&lt;/li>
+                                                            }) : null
+                                                        }
+                                                    &lt;/ul>
+                                                    &lt;span>Proximate distance from starting location: {Math.round(item.block_info.distance * 100) / 100} km&lt;/span>
+                                                &lt;/div>
+                                            &lt;/div>
+                                        )
+                                    })
+                                }
+                            &lt;/ScrollableList> : null
+                        }
+                &lt;/div>
+                &lt;div className="google-map-container" id="gmap" style={{flex: 2, width: "100%", position: "relative", padding: 15, minHeight: "800px"}}>
+                        &lt;Map defaultCenter={{lat: 1.3521, lng: 103.8198}} defaultZoom={15} center={pos} zoom={zoom} mapStyle={{height: "100%", width: "100%"}}>
+                            {
+                                blocks.current.length > 0 ? blocks.current.map((item, index) => {
+                                    return (
+                                        &lt;Marker key={index * item.block_info.basic.position.lat + item.block_info.basic.position.lon} color={"#af5cd9"} lat={item.block_info.basic.position.lat} lng={item.block_info.basic.position.lon}/>
+                                    )
+                                }) : null
+                            }
+                            {
+                                facilityMarkers.current.length > 0 ? facilityMarkers.current.filter(item => !filterOutFac.includes(item.type)).map(item => {
+                                    return &lt;Marker key={item.lat + item.lng} color={"#FF5cd9"} lat={item.lat} lng={item.lng}/>
+                                }) : null
+                            }
+                        &lt;/Map>
+                &lt;/div>
+            &lt;/div>
+        &lt;/div>
+    )
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Accordion">Accordion</a></li><li><a href="global.html#accordionInfo">accordionInfo</a></li><li><a href="global.html#App">App</a></li><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Carousel">Carousel</a></li><li><a href="global.html#carouselInfo">carouselInfo</a></li><li><a href="global.html#carouselLanding">carouselLanding</a></li><li><a href="global.html#CheckBox">CheckBox</a></li><li><a href="global.html#contact">contact</a></li><li><a href="global.html#DropDown">DropDown</a></li><li><a href="global.html#faqAns">faqAns</a></li><li><a href="global.html#fetchGMapsAPIKey">fetchGMapsAPIKey</a></li><li><a href="global.html#fetchSearchRequest">fetchSearchRequest</a></li><li><a href="global.html#fetchValuationRequest">fetchValuationRequest</a></li><li><a href="global.html#Filter">Filter</a></li><li><a href="global.html#flatType">flatType</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#GMap">GMap</a></li><li><a href="global.html#labels">labels</a></li><li><a href="global.html#Layout">Layout</a></li><li><a href="global.html#links">links</a></li><li><a href="global.html#MainNav">MainNav</a></li><li><a href="global.html#mainNav">mainNav</a></li><li><a href="global.html#Marker">Marker</a></li><li><a href="global.html#postContactUs">postContactUs</a></li><li><a href="global.html#RadioButton">RadioButton</a></li><li><a href="global.html#rangeMarks">rangeMarks</a></li><li><a href="global.html#RangeSlider">RangeSlider</a></li><li><a href="global.html#ScrollableList">ScrollableList</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchRes">searchRes</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#valRes">valRes</a></li><li><a href="global.html#valuation">valuation</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Apr 04 2022 23:08:22 GMT+0800 (Singapore Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

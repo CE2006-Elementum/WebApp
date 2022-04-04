@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Routes/Index.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Routes/Index.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState } from 'react';
+import { HashLink } from 'react-router-hash-link';
+import { useNavigate } from 'react-router-dom';
+
+import Accordion from '../Components/Accordion';
+import Carousel from '../Components/Carousel';
+import { DropDown, TextField, Button, RangeSlider, CheckBox } from '../Components/InputField';
+import { flatType, carouselLanding, carouselInfo, accordionInfo, rangeMarks, search, valuation } from '../Utils/Enums';
+import { fetchSearchRequest, fetchValuationRequest } from '../Utils/Fetch';
+
+/**
+ * Landing screen / Home screen
+ * @component
+ * @author Zhi Heng
+ * @return A populated view
+ */
+export default function Index(){
+    const navigate = useNavigate();
+    const [searchForm, setSearchForm] = useState({...search});
+    const [valuationForm, setValuationForm] = useState({...valuation});
+    const [error, setError] = useState({search: "", valuation: ""});
+    let facilities = [];
+    let blocks = [];
+    let facilityMarkers = [];
+    let property = [];
+    let factypes = [];
+
+    /**
+     * Custom Carousel Indicator for form selection
+     * @component
+     * @author Zhi Heng
+     * @param {fuction} clickHandler Predefined, do not change
+     * @param {boolean} isSelected Predefined, do not change
+     * @param {number} index Predefined, do not change
+     * @param {string} label Predefined, do not change
+     * @returns An JSX Element
+     */
+    const customIndicator = (clickHandler, isSelected, index, label) => {
+        const selected = isSelected ? "var(--font-color-active)" : "var(--font-color-inactive)";
+        return (
+            &lt;div style={{display: "flex", flexDirection: "row", justifyContent: "center"}}>
+                &lt;div onClick={clickHandler} aria-label={`Selected: ${label} ${index + 1}`} title={`Selected: ${label} ${index + 1}`} style={{display: "flex", justifyContent: "center", color: selected, margin: 5}}>
+                    &lt;h2 className="form-selector">{ index === 0 ? "Search" : "Valuation"}&lt;/h2>
+                &lt;/div>
+                {index % 2 === 0 ? &lt;div className="divider" style={{width: 2, height: "60px", backgroundColor: "var(--font-color-active)", justifySelf: "center"}}>&lt;/div> :  null}
+            &lt;/div>
+        );
+    }
+
+    /**
+     * Location Finder Form Handler to prepare the request that is to be sent on click
+     * @author Zhi Heng
+     * @param {object} e Value for which to be updated
+     * @param {string} key Key for which the value is to be updated
+     */
+    const updateLocationFinderForm = (e, key) => {
+        const keySplit = key.split('.'); //Splits all keys to be used
+        const shallowCopy = {...searchForm}; //Shallow copying
+        const keys = Object.keys(shallowCopy.search); //Get all keys
+        const index = keys.indexOf(keySplit[0]); //Get index of matching key
+        const secondaryKeys = Object.keys(shallowCopy.search[keys[index]]); //Get all secondary keys
+        const secondaryIndex = secondaryKeys.indexOf(keySplit[1]); //Get index of matching secondary key
+        if(keySplit.length === 2) {
+            if(typeof(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]]) === "object") { //Checks if the typeof the key-value pair is an object
+                if(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].indexOf(e) === -1)
+                    shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].push(e);
+                else shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].pop(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]].indexOf(e));
+            }
+            else shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]] = e;
+        } else if(keySplit.length === 3) {
+            const tertiaryKeys = Object.keys(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]]); //Get all tertiary keys
+            const tertiaryIndex = tertiaryKeys.indexOf(keySplit[2]); //Get index of matching tertiary key
+            if(typeof(shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]][tertiaryKeys[tertiaryIndex]]) === "object") //Checks if the typeof the key-value pair is an object
+                shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]][tertiaryKeys[tertiaryIndex]].push(e);
+            else shallowCopy.search[keys[index]][secondaryKeys[secondaryIndex]][tertiaryKeys[tertiaryIndex]] = e;
+        }
+        setSearchForm(shallowCopy);
+    }
+
+    /**
+     * Valuation Form Handler to prepare the request that is to be sent on click
+     * @author Zhi Heng
+     * @param {*} e Value for which to be updated
+     * @param {string} key Key for which the value is to be updated
+     */
+    const updateValuationForm = (e, key) => {
+        const shallowCopy = {...valuationForm}; //Shallow copying
+        const keys = Object.keys(shallowCopy.valuation); //Get all keys
+        const index = keys.indexOf(key); //Get index of matching key
+        shallowCopy.valuation[keys[index]] = e;
+        setValuationForm(shallowCopy);
+    }
+
+    /**
+     * Performs a validation on searchForm to ensure that all fields are filled. Then, proceeds to fetch data from the server.
+     * @author Zhi Heng
+     * @returns Nothing, only to cause navigation on success, else it'll display an error message.
+     */
+    const submitSearch = async() => {
+        setError({...error, search: ""});
+        if(searchForm.search.roi.center === null || searchForm.search.roi.center === ""
+            || searchForm.search.roi.radius === 0.0 || searchForm.search.facilities.musthave.length &lt;= 0) {
+            setError({...error, search: "Please check if you've filled in all fields."});
+            return;
+        }
+        const holder = {...searchForm.search};
+        setSearchForm({...searchForm});
+        fetchSearchRequest(holder).then(response => {
+            if(response.status === 200) {
+                return response.json();
+            }
+            else {
+                setError({...error, search: "Error! " + response.status + ". Error details: " + response.statusText + ". Please contact our support team!"});
+                return null;
+            }
+        }).then(response => {
+            if(response !== null) {
+                subscriberSearch(response);
+                navigate('/locationfinder', {state: {blocks, facilities, facilityMarkers, factypes}});
+            }
+        }).catch(error => {
+            setError({...error, search: error});
+        });
+        setSearchForm({...searchForm});
+    }
+
+    /**
+     * Performs a validation on searchForm to ensure that all fields are filled. Then, proceeds to fetch data from the server.
+     * @author Zhi Heng
+     * @returns Nothing, only to cause navigation on success, else it'll display an error message.
+     */
+    const submitValuation = async() => {
+        setError({...error, valuation: ""});
+        if(valuationForm.valuation.area &lt;= 0 || valuationForm.valuation.location === null 
+            || valuationForm.valuation.location === "") {
+                setError({...error, valuation: "Please check if you've filled in all fields."});
+                return;
+        }
+        const holder = {...valuationForm.valuation};
+        setValuationForm({...valuationForm});
+        fetchValuationRequest(valuationForm.valuation).then(response => {
+            if(response.status === 200){
+                return response.json();
+            }
+            else { 
+               setError({...error, valuation: "Error! " + response.status + ". Error details: " + response.statusText + ". Please contact our support team!"});
+               return null;
+            }
+        }).then(response => {
+                if(response !== null) {
+                    subscriberValuation(response);
+                    navigate('/valuation', {state: {property}});
+                }
+        }).catch(error => {
+            setError({...error, valuation: error});
+        });
+        setValuationForm({...valuationForm});
+    };
+
+    /**
+     * Performs transformation of response from the server
+     * @author Zhi Heng
+     * @param {object} response Data received from server
+     */
+    const subscriberSearch = (response) => {
+        blocks = [];
+        if(response.blocks.length > 0) {
+            const data = {...response}; //Shallow copy
+            data.blocks.forEach(block => {
+                facilities = [];
+                block.facilities.forEach(facility => {
+                    if(facilities.length === 0 || facilities.find(item => item.id === facility) === undefined)
+                        facilities.push({id: facility, info: data.facility_info[facility]});
+                });
+                blocks.push({block_info: block, facility_info: facilities});
+            });
+            if(blocks[0].facility_info.length > 0) {
+                facilityMarkers = [];
+                blocks.forEach(item => {
+                    item.facility_info.forEach(facility => {
+                        if(facilityMarkers.length === 0 || facilityMarkers.find(item => item.id === facility.id) === undefined) {
+                            facilityMarkers.push({id: facility.id, lat: facility.info.position.lat, lng: facility.info.position.lon, type: facility.info.factype});
+                            if(factypes.length === 0 || factypes.find(item => item === facility.info.factype) === undefined)
+                                factypes.push(facility.info.factype);
+                        }
+                    })
+                });
+            }
+        }
+    };
+
+    /**
+     * Performs transformation of response from the server
+     * @author Zhi Heng
+     * @param {object} response Data received from server
+     */
+    const subscriberValuation = (response) => {
+        if(response.nearby_valuations.length > 0) {
+            property = response;
+        }
+    };
+
+    return (
+        &lt;div aria-label="container" className="container" style={{display: "flex", flexDirection: "column"}}>
+            &lt;Carousel showArrows={true}>
+                {
+                    carouselLanding.map(element => {
+                        return (
+                            &lt;div className="carousel-image-inner" style={{display: "flex", flexDirection: "column", justifyContent: "center"}} key={element.image}>
+                                &lt;img className="landImg" src={element.image} alt="Carousel"/>
+                                &lt;div style={{width: "100%", position: "absolute", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center"}}>
+                                    &lt;h1 className="landText-main" style={{color: "var(--font-color-light)", fontWeight: "normal", fontSize: 48}}>{element.childElement[0]}&lt;/h1>
+                                    &lt;h1 className="landText-sub" style={{color: "var(--font-color-light)", fontWeight: "normal", fontSize: 36}}>{element.childElement[1]}&lt;/h1>
+                                &lt;/div>
+                            &lt;/div>
+                        )
+                    })
+                    
+                }            
+            &lt;/Carousel>
+            &lt;section className="infoSlide" style={{width: "100%", display: "flex"}}>
+                &lt;div style={{backgroundImage: `url(${require('../assets/fa8bb51091f0c91393bdb6be0ed64d242.png')})`, backgroundSize: "100% 100%", display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                    &lt;div style={{width: "50%", justifyContent: "center", display: "flex", flexDirection: "column", marginLeft: 50}}>
+                        &lt;h1 className="infoSlide-text" style={{color: "var(--font-color-light)", fontWeight: 500}}>With the help of our algorithms, we are easily able to help you find locations for your forever home!&lt;/h1>
+                        &lt;Button 
+                            innerHTML={&lt;HashLink style={{textDecoration: "none", color: "var(--font-color-light)"}} smooth to="#locationFinder">Find Out More!&lt;/HashLink>}
+                            buttonStyles={
+                                {
+                                    height: 56,
+                                    padding: 20,
+                                    fontSize: 20,
+                                    backgroundColor: "#D48472",
+                                    border: "none",
+                                    borderRadius: 10,
+                                    color: "var(--font-color-light)",
+                                    fontWeight: 500,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                }
+                            }
+                        />
+                    &lt;/div>
+                &lt;/div>
+            &lt;/section>
+            &lt;section className="infoSlide" style={{width: "100%", display: "flex"}}>
+                &lt;div style={{backgroundImage: `url(${require('../assets/ac81c5bc300e898556d32483977be06b.png')})`, backgroundSize: "100% 100%", display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                    &lt;div style={{width: "25%", justifyContent: "center", display: "flex", flexDirection: "column", marginLeft: 50}}>
+                        &lt;h1 className="infoSlide-text" style={{color: "var(--font-color-light)", fontWeight: 500}}>Through the use of historical data, we are easily able to do an estimated valuation of your home!&lt;/h1>
+                        &lt;Button 
+                            innerHTML={&lt;HashLink style={{textDecoration: "none", color: "var(--font-color-light)"}} smooth to="#valuation">Find Out More!&lt;/HashLink>}
+                            buttonStyles={
+                                {
+                                    height: 56,
+                                    padding: 20,
+                                    fontSize: 20,
+                                    backgroundColor: "#73B4F0",
+                                    border: "none",
+                                    borderRadius: 10,
+                                    color: "var(--font-color-light)",
+                                    fontWeight: 500,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                }
+                            }
+                        />
+                    &lt;/div>
+                &lt;/div>
+            &lt;/section>
+            &lt;section style={{width: "100%", display: "inline-flex"}}>
+                &lt;div style={{width: "50%"}}>
+                    &lt;Carousel showArrows={true}>
+                        {
+                            carouselInfo.map(item => {
+                                return &lt;img className="form-carousel-img" key={item.image} src={item.image} alt="Carousel"/>
+                            })
+                        }
+                    &lt;/Carousel>
+                &lt;/div>
+                &lt;div className="form-groups" style={{width: "50%", display:"flex", flexDirection: "column", justifyContent: "center", minHeight: "500px"}}>
+                    &lt;Carousel showArrows={false} renderIndicator={(clickHandler, isSelected, index, label) => customIndicator(clickHandler, isSelected, index, label)} dynamicHeight>
+                        &lt;div id="locationFinder" style={{padding: 20, width: "100%", display: "flex", flexDirection: "column",}}>
+                            &lt;h2 className="form-header" style={{color: "var(--font-color-active)"}}>Start searching for your dream home location with us!!&lt;/h2>
+                            &lt;form>
+                                &lt;span aria-label="searchError" style={{fontSize: 24, color: "red"}}>{error.search}&lt;/span>
+                                &lt;TextField
+                                    name={"address1"}
+                                    placeholder={"Address"}
+                                    styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
+                                    onChange={(e) => {updateLocationFinderForm(e, "roi.center")}}
+                                    containerStyle={{margin: 15}}
+                                />
+                                &lt;div style={{display:"flex", flexDirection: "column", alignItems: "self-start", paddingBottom: 30}}>
+                                    {
+                                        accordionInfo.map(element => {
+                                            return &lt;Accordion key={element.title} data={element} styles={{width: "100%", display: "flex", flexDirection: "column"}}>
+                                                &lt;div style={{display: "flex", flexDirection: "column"}}>
+                                                    {
+                                                        element.children.map(child => {
+                                                            return &lt;CheckBox key={child.enc} label={child.label} enc={child.enc} onChange={(e) => updateLocationFinderForm(e, "facilities.musthave")}/>
+                                                        })
+                                                    }
+                                                &lt;/div>
+                                            &lt;/Accordion>
+                                        })
+                                    }
+                                    &lt;Accordion data={{title: "Flat Properties"}} styles={{width: "100%", display: "flex", flexDirection: "column"}}>
+                                        &lt;div style={{display: "flex", flexDirection: "column"}}>
+                                            {
+                                                flatType.map(type => {
+                                                    return &lt;CheckBox key={type.label + type.enc} label={type.label} enc={type.enc} onChange={(e) => updateLocationFinderForm(e, "flat_properties.room_types")}/>
+                                                })
+                                            }
+                                            &lt;RangeSlider name="Floors" label="Floors" min={1} max={25} step={1} onChange={(e) => updateLocationFinderForm(e, "flat_properties.storey_range.max")}/>
+                                            &lt;RangeSlider name="Floor Area (sqm)" label="FAsqm" min={20} max={300} step={10} onChange={(e) => updateLocationFinderForm(e, "flat_properties.area_range.max")}/>
+                                            &lt;RangeSlider name="Price (million)" label="Price" min={0.1} max={2.0} step={0.1} onChange={(e) => updateLocationFinderForm(e, "flat_properties.price_range.max")}/>
+                                        &lt;/div>
+                                    &lt;/Accordion>
+                                    &lt;RangeSlider name="Range" label="Range" min={0} max={2} step={0.1} onChange={(e) => updateLocationFinderForm(parseFloat(e), "facilities.distance")} marks={rangeMarks} units={"km"}/>
+                                &lt;/div>
+                                &lt;Button 
+                                    aria-label="searchButton"
+                                    innerHTML={"Find me some locations!"}
+                                    buttonStyles={
+                                        {
+                                            height: 56,
+                                            padding: 20,
+                                            fontSize: 20,
+                                            backgroundColor: "#73B4F0",
+                                            border: "none",
+                                            borderRadius: 10,
+                                            color: "var(--font-color-light)",
+                                            fontWeight: 500,
+                                            display: "flex",
+                                            alignItems: "center"
+                                        }
+                                    }
+                                    containerStyles={
+                                        {
+                                            display: "flex",
+                                            width: "100%",
+                                            justifyContent: "center"
+                                        }
+                                    }
+                                    onClickHandler={(e) => {
+                                        //TODO: Send form request to server
+                                        e.preventDefault();
+                                        submitSearch();
+                                    }
+                                }
+                                />
+                            &lt;/form>
+                        &lt;/div>
+                        &lt;div id="valuation" style={{padding: 20, width: "100%", display: "flex", flexDirection: "column",}}>
+                            &lt;h2 className="form-header" style={{color: "var(--font-color-active)"}}>Get an estimated valuation from us now!&lt;/h2>
+                            &lt;form>
+                                &lt;span aria-label="valueError" style={{fontSize: 24, color: "red"}}>{error.valuation}&lt;/span>
+                                &lt;TextField
+                                    name={"address2"}
+                                    placeholder={"Address"}
+                                    styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
+                                    onChange={(e) => updateValuationForm(e, "location")}
+                                    containerStyle={{margin: 15}}
+                                />
+                                &lt;TextField
+                                    name={"floorArea"}
+                                    placeholder={"Floor Area (sqm)"}
+                                    styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
+                                    onChange={(e) => updateValuationForm(parseInt(e), "area")}
+                                    containerStyle={{margin: 15}}
+                                />
+                                &lt;DropDown
+                                    name={"flatType"}
+                                    styles={{fontSize: 24, padding: 10, borderRadius: 10, marginBottom: 5, width: "100%"}}
+                                    onChange={(e) => updateValuationForm(e, "room_type")}
+                                >
+                                    {
+                                        flatType.map(type => {
+                                            return &lt;option value={type.enc} key={type.label}>{type.label}&lt;/option>
+                                        })
+                                    }
+                                &lt;/DropDown>
+                                &lt;Button
+                                    aria-label="valuationButton"
+                                    innerHTML={"Calculate my property’s value"}
+                                    buttonStyles={
+                                        {
+                                            height: 56,
+                                            padding: 20,
+                                            fontSize: 20,
+                                            backgroundColor: "#73B4F0",
+                                            border: "none",
+                                            borderRadius: 10,
+                                            color: "var(--font-color-light)",
+                                            fontWeight: 500,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            justifyContent: "center",
+                                            margin: "auto"
+                                        }
+                                    }
+                                    onClickHandler={(e) => {
+                                            //TODO: Send form request to server
+                                            e.preventDefault();
+                                            submitValuation();
+                                        }
+                                    }
+                                />
+                            &lt;/form>
+                        &lt;/div>
+                    &lt;/Carousel>
+                &lt;/div>
+            &lt;/section>
+        &lt;/div>
+    );
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Accordion">Accordion</a></li><li><a href="global.html#accordionInfo">accordionInfo</a></li><li><a href="global.html#App">App</a></li><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Carousel">Carousel</a></li><li><a href="global.html#carouselInfo">carouselInfo</a></li><li><a href="global.html#carouselLanding">carouselLanding</a></li><li><a href="global.html#CheckBox">CheckBox</a></li><li><a href="global.html#contact">contact</a></li><li><a href="global.html#DropDown">DropDown</a></li><li><a href="global.html#faqAns">faqAns</a></li><li><a href="global.html#fetchGMapsAPIKey">fetchGMapsAPIKey</a></li><li><a href="global.html#fetchSearchRequest">fetchSearchRequest</a></li><li><a href="global.html#fetchValuationRequest">fetchValuationRequest</a></li><li><a href="global.html#Filter">Filter</a></li><li><a href="global.html#flatType">flatType</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#GMap">GMap</a></li><li><a href="global.html#labels">labels</a></li><li><a href="global.html#Layout">Layout</a></li><li><a href="global.html#links">links</a></li><li><a href="global.html#MainNav">MainNav</a></li><li><a href="global.html#mainNav">mainNav</a></li><li><a href="global.html#Marker">Marker</a></li><li><a href="global.html#postContactUs">postContactUs</a></li><li><a href="global.html#RadioButton">RadioButton</a></li><li><a href="global.html#rangeMarks">rangeMarks</a></li><li><a href="global.html#RangeSlider">RangeSlider</a></li><li><a href="global.html#ScrollableList">ScrollableList</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchRes">searchRes</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#valRes">valRes</a></li><li><a href="global.html#valuation">valuation</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Apr 04 2022 23:08:22 GMT+0800 (Singapore Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -4,9 +4,11 @@ import { mainNav } from '../Utils/Routes';
 
 /**
  * Bottom of page navigation
- * @returns An JSX.Element
+ * @component
+ * @author Zhi Heng
+ * @returns {JSX.Element} An JSX.Element
  */
-export default function Footer(){
+function Footer(){
     return (
       <div className="footer-container" style={{display: "flex", flexDirection: "column", backgroundColor: "var(--font-color-inactive)", height: "100%", padding: 15, alignItems: "center"}}>
         <nav style={{display: "flex", flexDirection: "row", justifyContent: "space-around", width: "100%"}}>
@@ -30,3 +32,4 @@ export default function Footer(){
       </div>
     );
 }
+export default Footer;

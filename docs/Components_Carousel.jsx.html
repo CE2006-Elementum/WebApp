@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Components/Carousel.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Components/Carousel.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from 'react';
+import { Carousel as CarouselC } from 'react-responsive-carousel';
+
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+
+/**
+ * Custom JS carousel
+ * @component
+ * @author Zhi Heng
+ * @param {Object} props Component props
+ * @param {Object} props.imageList Images to be displayed
+ * @param {number} props.imgHeight Fixed height to render
+ * @param {JSX.Element} props.children Child Elements to display
+ * @param {boolean} props.showArrows To display arrows or not
+ * @param {JSX.Element} props.renderIndicator Custom Indicator
+ * @param {boolean} props.dynamicHeight Dynamically adjust height
+ * @returns {JSX.Element} An JSX.Element
+ */
+function Carousel({imageList, imgHeight, children, showArrows, renderIndicator, dynamicHeight}) {
+
+    /**
+     * Custom arrow element
+     * @component
+     * @author Zhi Heng
+     * @param {function} clickHandler Predefined
+     * @param {function} hasNext Predefined
+     * @param {string} label Predefined
+     * @returns {JSX.Element} An JSX.Element
+     */
+    const customRenderNextArrow = (clickHandler, hasNext, label) => {
+        return showArrows ? &lt;div onClick={clickHandler} title={label} style={{position: 'absolute', zIndex: 2, top: 'calc(50% - 15px)', width: 30, height: 30, right: 15}}>
+            &lt;img src={require("../assets/db474e2803660d679789b4a6c20689bb.png")} alt="Next"/>
+        &lt;/div> : null
+    }
+
+    /**
+     * Custom arrow element
+     * @component
+     * @author Zhi Heng
+     * @param {function} clickHandler Predefined
+     * @param {function} hasNext Predefined
+     * @param {string} label Predefined
+     * @returns {JSX.Element} An JSX.Element
+     */
+    const customRenderPrevArrow = (clickHandler, hasNext, label) => {
+        return showArrows ? &lt;div onClick={clickHandler} title={label} style={{position: 'absolute', zIndex: 2, top: 'calc(50%)', width: 30, height: 30, left: 15}}>
+            &lt;img src={require("../assets/9a92df5583b2c2b4c8674728e44c2a79.png")} alt="Previous"/>
+        &lt;/div> : null
+    }
+
+    return (
+        &lt;div className="Carousel-container" style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+            &lt;CarouselC 
+                showThumbs={false} 
+                infiniteLoop
+                showStatus={false} 
+                renderArrowNext={(clickHandler, hasNext, label) => customRenderNextArrow(clickHandler, hasNext, label)} 
+                renderArrowPrev={(clickHandler, hasNext, label) => customRenderPrevArrow(clickHandler, hasNext, label)}
+                renderIndicator={renderIndicator}
+                dynamicHeight={dynamicHeight &amp;&amp; true}
+            >
+            {
+                imageList ? imageList.map(item => { 
+                    return (
+                        &lt;div style={{display: "flex", flexDirection: "column", justifyContent: "center", height:imgHeight}} key={item.image}>
+                            &lt;img src={item.image} alt="Carousel"/>
+                        &lt;/div>  
+                    );
+
+                }) : children
+            }
+            &lt;/CarouselC>
+        &lt;/div>
+    );
+}
+
+export default Carousel;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#Accordion">Accordion</a></li><li><a href="global.html#accordionInfo">accordionInfo</a></li><li><a href="global.html#App">App</a></li><li><a href="global.html#Button">Button</a></li><li><a href="global.html#Carousel">Carousel</a></li><li><a href="global.html#carouselInfo">carouselInfo</a></li><li><a href="global.html#carouselLanding">carouselLanding</a></li><li><a href="global.html#CheckBox">CheckBox</a></li><li><a href="global.html#contact">contact</a></li><li><a href="global.html#DropDown">DropDown</a></li><li><a href="global.html#faqAns">faqAns</a></li><li><a href="global.html#fetchGMapsAPIKey">fetchGMapsAPIKey</a></li><li><a href="global.html#fetchSearchRequest">fetchSearchRequest</a></li><li><a href="global.html#fetchValuationRequest">fetchValuationRequest</a></li><li><a href="global.html#Filter">Filter</a></li><li><a href="global.html#flatType">flatType</a></li><li><a href="global.html#Footer">Footer</a></li><li><a href="global.html#GMap">GMap</a></li><li><a href="global.html#labels">labels</a></li><li><a href="global.html#Layout">Layout</a></li><li><a href="global.html#links">links</a></li><li><a href="global.html#MainNav">MainNav</a></li><li><a href="global.html#mainNav">mainNav</a></li><li><a href="global.html#Marker">Marker</a></li><li><a href="global.html#postContactUs">postContactUs</a></li><li><a href="global.html#RadioButton">RadioButton</a></li><li><a href="global.html#rangeMarks">rangeMarks</a></li><li><a href="global.html#RangeSlider">RangeSlider</a></li><li><a href="global.html#ScrollableList">ScrollableList</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#searchRes">searchRes</a></li><li><a href="global.html#server">server</a></li><li><a href="global.html#TextArea">TextArea</a></li><li><a href="global.html#TextField">TextField</a></li><li><a href="global.html#valRes">valRes</a></li><li><a href="global.html#valuation">valuation</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Apr 04 2022 23:08:22 GMT+0800 (Singapore Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
