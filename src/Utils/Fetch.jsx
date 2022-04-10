@@ -1,7 +1,6 @@
 import React from 'react';
 
-const PORT = 43325;
-const SERVER = "http://127.0.0.1:" + PORT;
+const SERVER = process.env.REACT_APP_BACKEND_URL || "http://localhost:43325";
 
 /**
  * Creates an HTTP request to the server with the form data

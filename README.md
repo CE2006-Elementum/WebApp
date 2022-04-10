@@ -68,3 +68,11 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+# Containerization
+
+The Containerfile can be built to create a Nginx container image that serves
+the frontend on port 80.
+
+The environment variable `REACT_APP_BACKEND_URL` should be altered in case the
+backend is accessible at a different URL.
