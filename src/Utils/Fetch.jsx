@@ -66,7 +66,7 @@ export const fetchGMapsAPIKey = async(url = "/mapskey") => {
  * @param {string} [url=feedbacks] Endpoint to hit
  * @returns Response from server
  */
-export const postContactUs = async(data, url = "/feedbacks") => {
+export const postContactUs = async(data, url = "/feedback") => {
     const req = new Request(SERVER + url, {
         headers: {
             "Content-Type": "application/json",
